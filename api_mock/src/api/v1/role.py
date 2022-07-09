@@ -30,7 +30,7 @@ async def get_role(role_id: str, access_token: str) -> Role:
     response_model=Role,
     summary="🔓 🎩 Create new role from permission list"
 )
-async def create_role(role_id: str, access_token: str, permission: list[Permission]) -> Role:
+async def create_role(role_name: str, access_token: str, permissions: list[Permission]) -> Role:
     pass
 
 
