@@ -25,14 +25,15 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="refresh")
 async def login_user(credentials: Credentials) -> Union[TokenPair, UnauthorizedError]:
     pass
 
+
 @router.post(
     '/logout',
     responses={
         200: {'model': Message},
     },
-    summary="🔓 Logout user, by default at all device(all session)."
+    summary="🔓 Logout current user."
 )
-async def logout_current_session_user(access_token: str = Depends(oauth2_scheme), logout_all_device: bool = True) -> Message:
+async def logout_current_session_user(access_token: str = Depends(oauth2_scheme)) -> Message:
     pass
 
 
@@ -56,7 +57,7 @@ async def logout_others_session_user(access_token: str = Depends(oauth2_scheme))
     },
     summary="🔓 Get new access & refresh token"
 )
-async def refresh_token_user(refresh_token: RefreshToken) -> TokenPair:
+async def refresh_token_user(access_token: str = Depends(oauth2_scheme)) -> TokenPair:
     pass
 
 
@@ -68,5 +69,5 @@ async def refresh_token_user(refresh_token: RefreshToken) -> TokenPair:
     },
     summary="🔓 Get user history"
 )
-async def get_user_session_history(access_token: AccessToken, page: int = 1, page_size: int = 50) -> list[Session]:
+async def get_user_session_history(access_token: str = Depends(oauth2_scheme), page: int = 1, page_size: int = 50) -> list[Session]:
     pass
