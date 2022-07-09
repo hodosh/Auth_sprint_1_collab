@@ -45,7 +45,7 @@
 
 ![](img/api_user_03_getmyinfo.png)
 
-## API/users/me/permission/{permission_id}
+## API/users/me/permission/
 
 	**Параметры:**
     1) access_token
@@ -88,7 +88,7 @@
 
 ![](img/api_user_05_register_user.png)
 
-## API/users/{user_id}/update:
+## API/users/user/update:
 
 	**Параметры:**
     1) access_token
@@ -154,7 +154,7 @@
 
 ![](img/api_user_08_updateuser_me_1.png)
 
-## API/users/{user_id}/delete:
+## API/users/user/delete:
 
 	**Параметры:**
     1) access_token
