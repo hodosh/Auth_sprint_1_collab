@@ -39,6 +39,10 @@ class RoleShort(ORJSONModel):
     name: str
 
 
+class RoleName(ORJSONModel):
+    name: str
+
+
 class RoleID(ORJSONModel):
     id: str
 
