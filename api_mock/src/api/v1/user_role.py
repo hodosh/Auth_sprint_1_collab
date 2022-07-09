@@ -1,11 +1,12 @@
 from http import HTTPStatus
 from typing import Optional, Union
 
+from fastapi.security import OAuth2PasswordBearer
 from api.v1.view_models import User, Message, UserInfo, Role, UnauthorizedError, AccessToken, EditRole
 from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="refresh")
 
 @router.put(
     '/user/assign_role',
@@ -15,5 +16,5 @@ router = APIRouter()
     },
     summary="🔓 🎩 Assign new role to user"
 )
-async def user_assign_role(id: EditRole, access_token: AccessToken) -> Role:
+async def user_assign_role(id: EditRole, access_token = Depends(oauth2_scheme)) -> Role:
     pass
