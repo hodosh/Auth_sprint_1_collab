@@ -3,7 +3,8 @@ from typing import Optional, Union
 
 from fastapi.security import OAuth2PasswordBearer
 
-from api.v1.view_models import User, Message, UserInfo, Role, Permission, UnauthorizedError, TokenPair, AccessToken
+from api.v1.view_models import User, Message, UserInfo, Role, Permission, \
+    UnauthorizedError, TokenPair, AccessToken, UserID, UserEdit, Credentials4Register
 from fastapi import APIRouter, Depends, HTTPException
 
 
@@ -24,14 +25,14 @@ async def all_user(access_token: str = Depends(oauth2_scheme)) -> list[User]:
 
 
 @router.post(
-    '/{user_id}',
+    '/get_user',
     response_model=UserInfo,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 🎩 Get detail about single user by ID"
 )
-async def get_user(user_id: str, access_token: str = Depends(oauth2_scheme)) -> UserInfo:
+async def get_user(user_id: UserID, access_token: str = Depends(oauth2_scheme)) -> UserInfo:
     pass
 
 
@@ -67,33 +68,31 @@ async def get_user_permission(permission_id: str, access_token: str = Depends(oa
     },
     summary="Create new user"
 )
-async def register_user(email: str, password: str, password2: str) -> Union[Message, TokenPair]:
+async def register_user(euserInfo: Credentials4Register) -> Union[Message, TokenPair]:
     pass
 
 
 @router.put(
-    '/{user_id}/update',
+    '/user/update',
     response_model=UserInfo,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 🎩 Update user info"
 )
-async def update_user(user_id: str, access_token: str = Depends(oauth2_scheme), email: str = None, old_password: str = None,
-                      new_password: str = None,
-                      new_password2: str = None) -> UserInfo:
+async def update_user(user_info: UserEdit, user_id: UserID, access_token: str = Depends(oauth2_scheme)) -> UserInfo:
     pass
 
 
 @router.delete(
-    '/{user_id}/delete',
+    '/user/delete',
     response_model=Message,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 🎩  Delete user by ID, provide email for insurance"
 )
-async def delete_user(user_id: str, email: str, access_token: str = Depends(oauth2_scheme)) -> Message:
+async def delete_user(user_id: UserID, access_token: str = Depends(oauth2_scheme)) -> Message:
     pass
 
 
@@ -105,8 +104,7 @@ async def delete_user(user_id: str, email: str, access_token: str = Depends(oaut
     },
     summary="🔓 Update Myself user info"
 )
-async def update_me_user(email: str = None, old_password: str = None, new_password: str = None,
-                         new_password2: str = None, access_token: str = Depends(oauth2_scheme)) -> UserInfo:
+async def update_me_user(user_info: UserEdit, access_token: str = Depends(oauth2_scheme)) -> UserInfo:
     pass
 
 
@@ -118,5 +116,5 @@ async def update_me_user(email: str = None, old_password: str = None, new_passwo
     },
     summary="🔓 Delete Myself user info, provide email for insurance"
 )
-async def delete_me_user(email: str, access_token: str = Depends(oauth2_scheme)) -> Message:
+async def delete_me_user(access_token: str = Depends(oauth2_scheme)) -> Message:
     pass

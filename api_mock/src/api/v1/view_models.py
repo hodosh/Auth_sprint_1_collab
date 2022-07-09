@@ -43,8 +43,14 @@ class User(ORJSONModel):
 class UserInfo(ORJSONModel):
     id: str
     email: str
-
     role: Role
+
+
+class UserEdit(ORJSONModel):
+    email: str
+    old_password: str
+    new_password: str
+    new_password2: str
 
 
 class Message(ORJSONModel):
@@ -78,5 +84,20 @@ class Credentials(ORJSONModel):
     password: str
 
 
+class Credentials4Register(ORJSONModel):
+    email: str
+    password: str
+    password2: str
+
+
 class UnauthorizedError(ORJSONModel):
     value: str
+
+
+class UserID(ORJSONModel):
+    user_id: str
+
+
+class UserDeleteConformationInfo(ORJSONModel):
+    email: str
+    user_id: str
