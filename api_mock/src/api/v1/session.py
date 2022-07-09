@@ -1,53 +1,72 @@
 from http import HTTPStatus
-from typing import Optional, Union
+from typing import Optional, Union, List
 
-from api.v1.view_models import User, Message, UserInfo, Token, Session, TokenPair
+from fastapi.security import OAuth2PasswordBearer
+from starlette import status
+
+from api.v1.view_models import User, Message, UserInfo, Session, TokenPair, Credentials, UnauthorizedError, \
+    AccessToken, RefreshToken
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="refresh")
 
 
 @router.post(
     '/login',
-    response_model=Union[Message, Token],
+    responses={
+        200: {'model': TokenPair},
+        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'}
+    },
     summary="Login by user credit",
     description="Provide 2 tokens - access and refresh"
 )
-async def login_user(email: str, password: str) -> Union[Message, list[Token]]:
+async def login_user(credentials: Credentials) -> Union[TokenPair, UnauthorizedError]:
     pass
-
 
 @router.post(
     '/logout',
-    response_model=Message,
+    responses={
+        200: {'model': Message},
+    },
     summary="🔓 Logout user, by default at all device(all session)."
 )
-async def logout_current_session_user(access_token: str, logout_all_device:bool = True) -> Message:
+async def logout_current_session_user(access_token: str = Depends(oauth2_scheme), logout_all_device: bool = True) -> Message:
     pass
 
 
 @router.post(
     '/logout_others',
-    response_model=Message,
+    responses={
+        200: {'model': Message},
+        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
+    },
     summary="🔓 Logout at all device but current"
 )
-async def logout_others_session_user(access_token: str) -> Message:
+async def logout_others_session_user(access_token: str = Depends(oauth2_scheme)) -> Message:
     pass
 
 
 @router.post(
     '/refresh',
-    response_model=TokenPair,
+    responses={
+        200: {'model': UserInfo},
+        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
+    },
     summary="🔓 Get new access & refresh token"
 )
-async def refresh_token_user(refresh_token: str) -> TokenPair:
+async def refresh_token_user(refresh_token: RefreshToken) -> TokenPair:
     pass
 
 
 @router.post(
     '/history',
-    response_model=list[Session],
+    responses={
+        200: {'model': List[Session]},
+        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'}
+    },
     summary="🔓 Get user history"
 )
-async def get_user_session_history(access_token: str, page: int = 1, page_size: int = 50) -> list[Session]:
+async def get_user_session_history(access_token: AccessToken, page: int = 1, page_size: int = 50) -> list[Session]:
     pass
