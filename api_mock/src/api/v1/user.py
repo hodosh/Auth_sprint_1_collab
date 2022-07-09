@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Optional, Union
 
-from api.v1.view_models import User, Message, UserInfo, Token, Role
+from api.v1.view_models import User, Message, UserInfo, Token, Role, Permission
 from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
@@ -27,11 +27,29 @@ async def get_user(user_id: str, token: str) -> UserInfo:
 
 
 @router.post(
+    '/me',
+    response_model=UserInfo,
+    summary="Get detail about myself"
+)
+async def get_myself_info(token: str) -> UserInfo:
+    pass
+
+@router.post(
+    '/me/permission/{permission_name}',
+    response_model=Permission,
+    summary="Get single permission value"
+)
+async def get_user_permission(token: str) -> Permission:
+    pass
+
+
+
+@router.post(
     '/register',
     response_model=Message,
     summary="Create new user"
 )
-async def register_user(email: str, password: str, password2: str) -> Union[Message,Token]:
+async def register_user(email: str, password: str, password2: str) -> Union[Message, Token]:
     pass
 
 
@@ -40,7 +58,8 @@ async def register_user(email: str, password: str, password2: str) -> Union[Mess
     response_model=UserInfo,
     summary="Update user info"
 )
-async def update_user(user_id: str, token: str, email:str = None, old_password:str = None, new_password:str = None, new_password2:str = None) -> UserInfo:
+async def update_user(user_id: str, token: str, email: str = None, old_password: str = None, new_password: str = None,
+                      new_password2: str = None) -> UserInfo:
     pass
 
 
@@ -49,8 +68,26 @@ async def update_user(user_id: str, token: str, email:str = None, old_password:s
     response_model=UserInfo,
     summary="Delete user by ID, provide email for insurance"
 )
-async def delete_user(user_id: str, token: str, email:str) -> UserInfo:
+async def delete_user(user_id: str, token: str, email: str) -> UserInfo:
     pass
 
 
 
+
+@router.put(
+    '/me/update',
+    response_model=UserInfo,
+    summary="Update Myself user info"
+)
+async def update_me_user(token: str, email: str = None, old_password: str = None, new_password: str = None,
+                      new_password2: str = None) -> UserInfo:
+    pass
+
+
+@router.delete(
+    '/me/delete',
+    response_model=UserInfo,
+    summary="Delete Myself user info, provide email for insurance"
+)
+async def delete_me_user(token: str, email: str) -> UserInfo:
+    pass

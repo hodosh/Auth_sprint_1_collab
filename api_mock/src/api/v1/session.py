@@ -19,10 +19,19 @@ async def login_user(email: str, password: str) -> Union[Message, list[Token]]:
 
 @router.post(
     '/logout',
-    response_model=Union[Message, Token],
-    summary="Logout"
+    response_model=Message,
+    summary="Logout user, by default at all device(all session)."
 )
-async def logout_user(token: str) -> Message:
+async def logout_current_session_user(token: str, logout_all_device:bool = True) -> Message:
+    pass
+
+
+@router.post(
+    '/logout_others',
+    response_model=Message,
+    summary="Logout at all device but current"
+)
+async def logout_others_session_user(token: str) -> Message:
     pass
 
 
@@ -40,5 +49,6 @@ async def refresh_token_user(token: str) -> Token:
     response_model=list[Session],
     summary="Get user history"
 )
-async def get_user_session_history(token: str, user_id:str = None, page:int = 1, page_size:int = 50) -> list[Session]:
+async def get_user_session_history(token: str, user_id: str = None, page: int = 1, page_size: int = 50) -> list[
+    Session]:
     pass
