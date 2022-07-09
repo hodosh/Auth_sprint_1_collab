@@ -4,7 +4,7 @@ from typing import Optional, Union
 from fastapi.security import OAuth2PasswordBearer
 
 from api.v1.view_models import User, Message, UserInfo, Role, Permission, \
-    UnauthorizedError, TokenPair, AccessToken, UserID, UserEdit, Credentials4Register
+    UnauthorizedError, TokenPair, AccessToken, UserID, UserEdit, Credentials4Register, PermissionID
 from fastapi import APIRouter, Depends, HTTPException
 
 
@@ -49,14 +49,14 @@ async def get_myself_info(access_token: str = Depends(oauth2_scheme)) -> UserInf
 
 
 @router.post(
-    '/me/permission/{permission_id}',
+    '/me/permission',
     response_model=Permission,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 Get single permission value"
 )
-async def get_user_permission(permission_id: str, access_token: str = Depends(oauth2_scheme)) -> Permission:
+async def get_user_permission(permission_id: PermissionID, access_token: str = Depends(oauth2_scheme)) -> Permission:
     pass
 
 

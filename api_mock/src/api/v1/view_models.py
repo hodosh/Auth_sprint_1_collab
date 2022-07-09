@@ -18,6 +18,10 @@ class ORJSONModel(BaseModel):
         json_dumps = orjson_dumps
 
 
+class PermissionID(ORJSONModel):
+    id: str
+
+
 class Permission(ORJSONModel):
     id: str
     key: str
