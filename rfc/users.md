@@ -16,17 +16,17 @@
 
 ![users_all](img/api_user_01_usersall.png)
 
-## API/users/{user_id}
+## API/users/get_user
 
 	**Параметры:**
-	1) user_id
-    2) access_token
+    1) access_token
+    2) user_id
 
     **Выходное значение:**
     Полная информации из БД по пользователю в виде словаря
 
 	Логика:
-    1) Проверка уровня доступа, доступ для админа
+    1) Проверка уровня доступа в access_token, доступ для админа
 	2) Выдача полной информации из БД по user
 
 ![](img/api_user_02_getbyuserid.png)
@@ -40,7 +40,7 @@
     Полная информации из БД по пользователю (себе) в виде словаря
 
 	Логика:
-    1) Проверка уровня доступа
+    1) Проверка уровня доступа в access_token
 	2) Выдача полной информации из БД по user
 
 ![](img/api_user_03_getmyinfo.png)
@@ -49,13 +49,12 @@
 
 	**Параметры:**
     1) access_token
-    2) permission_id
 
     **Выходное значение:**
     Информация из БД по запрошенному доступу у пользователя 
 
     Логика:
-    1) Проверка уровня доступа
+    1) Проверка уровня доступа в access_token
     2) Выдача информации по доступу пользователя из БД
 
 ![](img/api_user_04_get_specific_permission.png)
@@ -91,12 +90,11 @@
 ## API/users/{user_id}/update:
 
 	**Параметры:**
-	1) user_id
-    2) access_token
-    3) email
-	4) password
-	5) new password
-	6) new password confirm
+    1) access_token
+    2) email
+	3) password
+	4) new password
+	5) new password confirm
     
     **Выходное значение:**
     Общая информация об обновленном пользователе
@@ -160,9 +158,7 @@
 ## API/users/{user_id}/delete:
 
 	**Параметры:**
-	1) user_id
-    2) access_token
-    3) email
+    1) access_token
 
     **Выходное значение:**
     Общая информация об удаленном пользователе
@@ -178,7 +174,6 @@
 
 	**Параметры:**
     1) access_token
-    2) email
 
     **Выходное значение:**
     Общая информация об удаленном пользователе
