@@ -16,7 +16,7 @@ app = FastAPI(
 
 app.include_router(user.router, prefix='/api/v1/users', tags=['User'])
 app.include_router(user_role.router, prefix='/api/v1/users', tags=['User Role'])
-app.include_router(session.router, prefix='/api/v1/users', tags=['Session'])
+app.include_router(session.router, prefix='/api/v1/auth', tags=['Session'])
 app.include_router(role.router, prefix='/api/v1/roles', tags=['Role'])
 
 

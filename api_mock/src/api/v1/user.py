@@ -10,18 +10,18 @@ router = APIRouter()
 @router.post(
     '/',
     response_model=list[User],
-    summary="Get All users"
+    summary="🔓 🎩  Get All users"
 )
-async def all_user(token: str) -> list[User]:
+async def all_user(access_token: str) -> list[User]:
     pass
 
 
 @router.post(
     '/{user_id}',
     response_model=UserInfo,
-    summary="Get detail about single user by ID"
+    summary="🔓 🎩 Get detail about single user by ID"
 )
-async def get_user(user_id: str, token: str) -> UserInfo:
+async def get_user(user_id: str, access_token: str) -> UserInfo:
     pass
 
 
@@ -29,17 +29,17 @@ async def get_user(user_id: str, token: str) -> UserInfo:
 @router.post(
     '/me',
     response_model=UserInfo,
-    summary="Get detail about myself"
+    summary="🔓 Get detail about myself"
 )
-async def get_myself_info(token: str) -> UserInfo:
+async def get_myself_info(access_token: str) -> UserInfo:
     pass
 
 @router.post(
-    '/me/permission/{permission_name}',
+    '/me/permission/{permission_id}',
     response_model=Permission,
-    summary="Get single permission value"
+    summary="🔓 Get single permission value"
 )
-async def get_user_permission(token: str) -> Permission:
+async def get_user_permission(permission_id: str, access_token: str) -> Permission:
     pass
 
 
@@ -56,9 +56,9 @@ async def register_user(email: str, password: str, password2: str) -> Union[Mess
 @router.put(
     '/{user_id}/update',
     response_model=UserInfo,
-    summary="Update user info"
+    summary="🔓 🎩 Update user info"
 )
-async def update_user(user_id: str, token: str, email: str = None, old_password: str = None, new_password: str = None,
+async def update_user(user_id: str, access_token: str, email: str = None, old_password: str = None, new_password: str = None,
                       new_password2: str = None) -> UserInfo:
     pass
 
@@ -66,9 +66,9 @@ async def update_user(user_id: str, token: str, email: str = None, old_password:
 @router.delete(
     '/{user_id}/delete',
     response_model=UserInfo,
-    summary="Delete user by ID, provide email for insurance"
+    summary="🔓 🎩  Delete user by ID, provide email for insurance"
 )
-async def delete_user(user_id: str, token: str, email: str) -> UserInfo:
+async def delete_user(user_id: str, access_token: str, email: str) -> UserInfo:
     pass
 
 
@@ -77,9 +77,9 @@ async def delete_user(user_id: str, token: str, email: str) -> UserInfo:
 @router.put(
     '/me/update',
     response_model=UserInfo,
-    summary="Update Myself user info"
+    summary="🔓 Update Myself user info"
 )
-async def update_me_user(token: str, email: str = None, old_password: str = None, new_password: str = None,
+async def update_me_user(access_token: str, email: str = None, old_password: str = None, new_password: str = None,
                       new_password2: str = None) -> UserInfo:
     pass
 
@@ -87,7 +87,7 @@ async def update_me_user(token: str, email: str = None, old_password: str = None
 @router.delete(
     '/me/delete',
     response_model=UserInfo,
-    summary="Delete Myself user info, provide email for insurance"
+    summary="🔓 Delete Myself user info, provide email for insurance"
 )
-async def delete_me_user(token: str, email: str) -> UserInfo:
+async def delete_me_user(access_token: str, email: str) -> UserInfo:
     pass

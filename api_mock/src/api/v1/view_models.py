@@ -65,6 +65,5 @@ class Session(ORJSONModel):
     id:str
     user_agent: str
     ip: str
-    refresh_token: str
     logout: bool
 
