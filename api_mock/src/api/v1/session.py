@@ -49,6 +49,5 @@ async def refresh_token_user(refresh_token: str) -> TokenPair:
     response_model=list[Session],
     summary="🔓 Get user history"
 )
-async def get_user_session_history(access_token: str,
-                                   user_id: str = None, page: int = 1, page_size: int = 50) -> list[Session]:
+async def get_user_session_history(access_token: str, page: int = 1, page_size: int = 50) -> list[Session]:
     pass
