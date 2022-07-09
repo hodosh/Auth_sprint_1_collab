@@ -52,13 +52,16 @@ class Message(ORJSONModel):
     body: str
 
 
-class Token(ORJSONModel):
-    jwt: str
-
-
-class TokenPair(ORJSONModel):
+class AccessToken(ORJSONModel):
     access_token: str
+
+
+class RefreshToken(ORJSONModel):
     refresh_token: str
+
+
+class TokenPair(AccessToken, RefreshToken):
+    pass
 
 
 class Session(ORJSONModel):
@@ -69,3 +72,11 @@ class Session(ORJSONModel):
     created: datetime
     modified: datetime
 
+
+class Credentials(ORJSONModel):
+    email: str
+    password: str
+
+
+class UnauthorizedError(ORJSONModel):
+    value: str
