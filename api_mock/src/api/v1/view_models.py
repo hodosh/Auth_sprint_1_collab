@@ -35,6 +35,15 @@ class RoleShort(ORJSONModel):
     name: str
 
 
+class RoleID(ORJSONModel):
+    id: str
+
+
+class EditRole(ORJSONModel):
+    user_id: str
+    role_id: str
+
+
 class User(ORJSONModel):
     id: str
     email: str
