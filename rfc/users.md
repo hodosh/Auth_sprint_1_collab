@@ -49,13 +49,14 @@
 
 	**Параметры:**
     1) access_token
+    2) permission_id
 
     **Выходное значение:**
     Информация из БД по запрошенному доступу у пользователя 
 
     Логика:
     1) Проверка уровня доступа в access_token
-    2) Выдача информации по доступу пользователя из БД
+    2) Выдача информации по запрошенному доступу пользователя из БД
 
 ![](img/api_user_04_get_specific_permission.png)
 
@@ -118,7 +119,6 @@
 	 - пароль совпадает -> шаг 4
 	7) перезапись нового юзера в БД
 
-![](img/api_user_06_updateuser_by_id_2.png)
 ![](img/api_user_06_updateuser_by_id_1.png)
 
 ## API/users/me/update:
@@ -153,12 +153,12 @@
 	7) перезапись юзера в БД
 
 ![](img/api_user_08_updateuser_me_1.png)
-![](img/api_user_08_updateuser_me_2.png)
 
 ## API/users/{user_id}/delete:
 
 	**Параметры:**
     1) access_token
+    2) user_id
 
     **Выходное значение:**
     Общая информация об удаленном пользователе
