@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Optional, Union
 
-from api.v1.view_models import User, Message, UserInfo, Token, Session
+from api.v1.view_models import User, Message, UserInfo, Token, Session, TokenPair
 from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
@@ -22,7 +22,7 @@ async def login_user(email: str, password: str) -> Union[Message, list[Token]]:
     response_model=Message,
     summary="🔓 Logout user, by default at all device(all session)."
 )
-async def logout_current_session_user(aceess_token: str, logout_all_device:bool = True) -> Message:
+async def logout_current_session_user(access_token: str, logout_all_device:bool = True) -> Message:
     pass
 
 
@@ -31,27 +31,17 @@ async def logout_current_session_user(aceess_token: str, logout_all_device:bool 
     response_model=Message,
     summary="🔓 Logout at all device but current"
 )
-async def logout_others_session_user(aceess_token: str) -> Message:
+async def logout_others_session_user(access_token: str) -> Message:
     pass
 
 
 @router.post(
-    '/update_access',
-    response_model=Token,
-    summary="🔓 Get new acceess token"
+    '/refresh',
+    response_model=TokenPair,
+    summary="🔓 Get new access & refresh token"
 )
-async def refresh_token_user(refresh_token: str) -> Token:
+async def refresh_token_user(refresh_token: str) -> TokenPair:
     pass
-
-
-@router.post(
-    '/update_refresh',
-    response_model=Token,
-    summary="🔓 Get new refresh token"
-)
-async def refresh_token_user(refresh_token: str) -> Token:
-    pass
-
 
 
 @router.post(
@@ -59,6 +49,6 @@ async def refresh_token_user(refresh_token: str) -> Token:
     response_model=list[Session],
     summary="🔓 Get user history"
 )
-async def get_user_session_history(aceess_token: str, user_id: str = None, page: int = 1, page_size: int = 50) -> list[
-    Session]:
+async def get_user_session_history(access_token: str,
+                                   user_id: str = None, page: int = 1, page_size: int = 50) -> list[Session]:
     pass

@@ -25,7 +25,6 @@ async def get_user(user_id: str, access_token: str) -> UserInfo:
     pass
 
 
-
 @router.post(
     '/me',
     response_model=UserInfo,
@@ -34,6 +33,7 @@ async def get_user(user_id: str, access_token: str) -> UserInfo:
 async def get_myself_info(access_token: str) -> UserInfo:
     pass
 
+
 @router.post(
     '/me/permission/{permission_id}',
     response_model=Permission,
@@ -41,7 +41,6 @@ async def get_myself_info(access_token: str) -> UserInfo:
 )
 async def get_user_permission(permission_id: str, access_token: str) -> Permission:
     pass
-
 
 
 @router.post(
@@ -58,20 +57,19 @@ async def register_user(email: str, password: str, password2: str) -> Union[Mess
     response_model=UserInfo,
     summary="🔓 🎩 Update user info"
 )
-async def update_user(user_id: str, access_token: str, email: str = None, old_password: str = None, new_password: str = None,
+async def update_user(user_id: str, access_token: str, email: str = None, old_password: str = None,
+                      new_password: str = None,
                       new_password2: str = None) -> UserInfo:
     pass
 
 
 @router.delete(
     '/{user_id}/delete',
-    response_model=UserInfo,
+    response_model=Message,
     summary="🔓 🎩  Delete user by ID, provide email for insurance"
 )
-async def delete_user(user_id: str, access_token: str, email: str) -> UserInfo:
+async def delete_user(user_id: str, access_token: str, email: str) -> Message:
     pass
-
-
 
 
 @router.put(
@@ -80,14 +78,14 @@ async def delete_user(user_id: str, access_token: str, email: str) -> UserInfo:
     summary="🔓 Update Myself user info"
 )
 async def update_me_user(access_token: str, email: str = None, old_password: str = None, new_password: str = None,
-                      new_password2: str = None) -> UserInfo:
+                         new_password2: str = None) -> UserInfo:
     pass
 
 
 @router.delete(
     '/me/delete',
-    response_model=UserInfo,
+    response_model=Message,
     summary="🔓 Delete Myself user info, provide email for insurance"
 )
-async def delete_me_user(access_token: str, email: str) -> UserInfo:
+async def delete_me_user(access_token: str, email: str) -> Message:
     pass

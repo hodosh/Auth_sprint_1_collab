@@ -25,30 +25,25 @@ class Permission(ORJSONModel):
 
 
 class Role(ORJSONModel):
-    id:str
+    id: str
     name: str
     permissions: list[Permission]
 
 
 class RoleShort(ORJSONModel):
-    id:str
+    id: str
     name: str
 
 
 class User(ORJSONModel):
     id: str
     email: str
-    password: str
-    created: datetime
-    modified: datetime
 
 
 class UserInfo(ORJSONModel):
     id: str
     email: str
-    password: str
-    created: datetime
-    modified: datetime
+
     role: Role
 
 
@@ -61,9 +56,16 @@ class Token(ORJSONModel):
     jwt: str
 
 
+class TokenPair(ORJSONModel):
+    access_token: str
+    refresh_token: str
+
+
 class Session(ORJSONModel):
-    id:str
+    id: str
     user_agent: str
     ip: str
     logout: bool
+    created: datetime
+    modified: datetime
 

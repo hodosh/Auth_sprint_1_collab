@@ -39,13 +39,13 @@ async def create_role(role_name: str, access_token: str, permissions: list[Permi
     response_model=Role,
     summary="🔓 🎩 Update role from permission list"
 )
-async def update_role(role_id: str, access_token: str, permission: list[Permission]) -> Message:
+async def update_role(role_id: str, access_token: str, permission: list[Permission]) -> Role:
     pass
 
 
 @router.delete(
     '/{role_id}/delete',
-    response_model=Role,
+    response_model=Message,
     summary="🔓 🎩 Delete role by ID"
 )
 async def delete_role(role_id: str, access_token: str) -> Message:
