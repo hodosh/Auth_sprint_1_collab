@@ -1,3 +1,13 @@
+ # Используемый стек
+ 
+- flask
+- SQLAlchemy
+- flask-alembic
+- flask-marshmallow - Валидация данных
+- flasgger - Документация API
+- flask-security - Механизмы работы с сессиями (токены)
+- flask-jwt-extended - генератор и валидатор JWT-токенов
+
 # База данных
 
 
