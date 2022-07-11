@@ -9,9 +9,9 @@ services:
       - ./flask_app/src:/usr/src/app
     env_file:
       - src/core/.env
-    command: gunicorn src.app:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --reload
-    expose:
-      - "8000"
+    command: uvicorn src.app:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
     networks:
       - api
     depends_on:
@@ -25,7 +25,7 @@ services:
     expose:
       - "5432"
     env_file:
-      - database/.env
+      - postgres/.env
     volumes:
       - ./database/init_data/:/docker-entrypoint-initdb.d/
       - ./database/data:/var/lib/postgresql/data/
@@ -35,10 +35,9 @@ services:
   redis:
     image: redis:6.2.6
     restart: always
-    container_name: redis_cashe
-    ports:
-      - "6379:6379"
-
+    container_name: redis
+    expose:
+      - "6379"
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
