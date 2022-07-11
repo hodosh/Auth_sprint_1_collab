@@ -1,4 +1,11 @@
 from flask import Flask
+import click
+from flasgger import Swagger
+from flask.cli import with_appcontext
+from flask_jwt_extended import JWTManager
+from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
+from flask_restful import Api
 
 from core.config import *
 from db.db import db
