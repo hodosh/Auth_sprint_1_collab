@@ -17,7 +17,7 @@ DB_PORT = os.getenv('DB_PORT', 5432)
 
 TESTING = os.getenv('TESTING', True)
 
-FLASK_HOST = os.getenv('FLASK_HOST', 'flask_app')
+FLASK_HOST = os.getenv('FLASK_HOST', '127.0.0.1')
 FLASK_PORT = os.getenv('FLASK_PORT', 8000)
 
 REDIS_HOST = os.getenv('REDIS_HOST', 'auth_redis')
