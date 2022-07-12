@@ -1,7 +1,8 @@
 # flask_app/db.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from core.config import *
+
+from flask_app.src.core.config import SQLALCHEMY_DATABASE_URI
 
 db = SQLAlchemy()
 
