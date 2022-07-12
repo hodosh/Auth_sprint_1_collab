@@ -1,9 +1,9 @@
 # flask_api/dm_models.py
 import uuid
 
+from db.db import db
 from sqlalchemy import Column, DateTime, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID
-from db.db import db
 from sqlalchemy.sql import func
 
 
@@ -59,6 +59,14 @@ class RolePermission(IDMixin, CreatedMixin):
 
     def __repr__(self):
         return f'<User {self.value}>'
+
+
+class UserRole(IDMixin, CreatedMixin):
+    __tablename__ = 'user_role'
+
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('User.id', ondelete='CASCADE'), nullable=False, index=True)
+    role_id = db.Column(UUID(as_uuid=True), db.ForeignKey('Permission.id', ondelete='CASCADE'), nullable=False,
+                        index=True)
 
 
 class UserHistory(IDMixin):
