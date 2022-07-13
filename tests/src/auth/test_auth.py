@@ -3,7 +3,7 @@ import requests
 from flask_jwt_extended import decode_token
 
 from extensions import check_if_token_is_revoked
-from flask_app.src.core import config
+from flask_app_old.src.core import config
 
 pytestmark = pytest.mark.asyncio
 

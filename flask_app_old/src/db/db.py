@@ -1,8 +1,8 @@
-# flask_app/db.py
+# flask_app_old/db.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from flask_app.src.core.config import SQLALCHEMY_DATABASE_URI
+from flask_app_old.src.core.config import SQLALCHEMY_DATABASE_URI
 
 db = SQLAlchemy()
 
