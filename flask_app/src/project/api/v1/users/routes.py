@@ -1,10 +1,9 @@
-import typing as t
 from http import HTTPStatus
 
 from apifairy import authenticate, body, response, other_responses
 from flask import abort
 
-from project import database, ma, token_auth, basic_auth
+from project import database, token_auth, basic_auth
 from project.models.models import (
     User,
     # UserRole,
@@ -12,34 +11,8 @@ from project.models.models import (
     # RolePermission,
     # Permission,
 )
+from project.schemas import new_user_schema, user_schema, UserSchema, token_schema
 from . import users_api_blueprint
-
-
-# -------
-# Schemas
-# -------
-
-class NewUserSchema(ma.Schema):
-    """Schema defining the attributes when creating a new user."""
-    email = ma.String()
-    password = ma.String()
-    password_confirm = ma.String()
-
-
-class UserSchema(ma.Schema):
-    """Schema defining the attributes of a user."""
-    id = ma.Integer()
-    email = ma.String()
-
-
-class TokenSchema(ma.Schema):
-    """Schema defining the attributes of a token."""
-    token = ma.String()
-
-
-new_user_schema = NewUserSchema()
-user_schema = UserSchema()
-token_schema = TokenSchema()
 
 
 @users_api_blueprint.route('/get-auth-token', methods=['POST'])
@@ -141,7 +114,6 @@ def get_user(user_id: str):
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
 
     return user
-
 
 # @users_api_blueprint.route('/<user_id>/permission', methods=['GET'])
 # @authenticate(token_auth)
