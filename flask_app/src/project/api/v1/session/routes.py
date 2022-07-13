@@ -1,13 +1,13 @@
 from apifairy import authenticate, body, other_responses, response
 from flask import abort
 
-from project import database, ma, token_auth
-from project.models.models import Entry
+from project import database, basic_auth
+from project.schemas import token_schema, history_schema
 
 from . import session_api_blueprint
 
 
-@users_api_blueprint.route('/get-auth-token', methods=['POST'])
+@session_api_blueprint.route('/get-auth-token', methods=['POST'])
 @authenticate(basic_auth)
 @response(token_schema)
 @other_responses({401: 'Invalid username or password'})
@@ -18,3 +18,17 @@ def get_auth_token():
     database.session.add(user)
     database.session.commit()
     return dict(token=token)
+
+
+@session_api_blueprint.route('/refresh', methods=['POST'])
+@authenticate(basic_auth)
+@response(token_schema, 200)
+async def refresh_token_user():
+    pass
+
+
+@session_api_blueprint.route('/history', methods=['GET'])
+@authenticate(basic_auth)
+@response(history_schema, 200)
+async def get_user_session_history():
+    pass
