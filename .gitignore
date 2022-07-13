@@ -1,0 +1,10 @@
+/database/data/
+/.idea/Auth_sprint_1_collab.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/database/.env
+/flask_app/src/core/.env
