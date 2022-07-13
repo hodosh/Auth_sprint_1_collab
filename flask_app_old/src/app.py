@@ -1,8 +1,8 @@
 from flask import Flask
 
-from flask_app.src.api.v1.auth import auth_blueprint
-from flask_app.src.api.v1.example import example_blueprint
-from flask_app.src.core import config
+from flask_app_old.src.api.v1.auth import auth_blueprint
+from flask_app_old.src.api.v1.example import example_blueprint
+from flask_app_old.src.core import config
 from db.db import db
 from extensions import jwt
 

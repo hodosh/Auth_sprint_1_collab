@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask_app.src.models.base import ORJSONModel
+from flask_app_old.src.models.base import ORJSONModel
 
 
 class Session(ORJSONModel):

@@ -1,7 +1,7 @@
 import redis
 from flask_jwt_extended import JWTManager
 
-from flask_app.src.core import config
+from flask_app_old.src.core import config
 
 jwt = JWTManager()
 

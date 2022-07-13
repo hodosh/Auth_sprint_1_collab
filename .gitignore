@@ -2,7 +2,7 @@
 /.idea/Auth_sprint_1_collab.iml
 /.idea/workspace.xml
 /database/.env
-/flask_app/src/core/.env
+/flask_app_old/src/core/.env
 
 
 .idea/
