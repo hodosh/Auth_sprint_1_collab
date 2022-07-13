@@ -22,7 +22,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="refresh")
     summary="Login by user credit",
     description="Provide 2 tokens - access and refresh"
 )
-async def login_user(credentials: Credentials) -> Union[TokenPair, UnauthorizedError]:
+async def login_user(email: str, password: str) -> Union[TokenPair, UnauthorizedError]:
     pass
 
 
@@ -31,28 +31,18 @@ async def login_user(credentials: Credentials) -> Union[TokenPair, UnauthorizedE
     responses={
         200: {'model': Message},
     },
-    summary="🔓 Logout current user."
+    summary="🔓 Logout current user (modes available)",
+    description="mode - possible values 'current','all','others'"
 )
-async def logout_current_session_user(access_token: str = Depends(oauth2_scheme)) -> Message:
+async def logout_all_session_user(mode: str = None, access_token: str = Depends(oauth2_scheme)) -> Message:
     pass
 
-
-@router.post(
-    '/logout_others',
-    responses={
-        200: {'model': Message},
-        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
-    },
-    summary="🔓 Logout at all device but current"
-)
-async def logout_others_session_user(access_token: str = Depends(oauth2_scheme)) -> Message:
-    pass
 
 
 @router.post(
     '/refresh',
     responses={
-        200: {'model': UserInfo},
+        200: {'model': TokenPair},
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 Get new access & refresh token"
@@ -61,7 +51,7 @@ async def refresh_token_user(access_token: str = Depends(oauth2_scheme)) -> Toke
     pass
 
 
-@router.post(
+@router.get(
     '/history',
     responses={
         200: {'model': List[Session]},

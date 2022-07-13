@@ -11,7 +11,7 @@ router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="refresh")
 
 
-@router.post(
+@router.get(
     '/',
     response_model=list[RoleShort],
     responses={
@@ -23,51 +23,75 @@ async def all_role(access_token: str = Depends(oauth2_scheme)) -> list[RoleShort
     pass
 
 
-@router.post(
-    '/detail',
+@router.get(
+    '/{role_id}',
     response_model=Role,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 🎩 Get detail about single role by ID"
 )
-async def get_role(role_id: RoleID, access_token: str = Depends(oauth2_scheme)) -> Role:
+async def get_role(role_id: str, access_token: str = Depends(oauth2_scheme)) -> Role:
     pass
 
 
 @router.post(
-    '/create',
+    '/',
     response_model=Role,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
-    summary="🔓 🎩 Create new role from permission list"
+    summary="🔓 🎩 Create new role"
 )
-async def create_role(role_name: RoleName, permissions: list[Permission], access_token: str = Depends(oauth2_scheme)) -> Role:
+async def create_role(role_name: str, access_token: str = Depends(oauth2_scheme)) -> Role:
     pass
 
 
 @router.put(
-    '/update',
+    '/{role_id}/',
     response_model=Role,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
-    summary="🔓 🎩 Update role from permission list"
+    summary="🔓 🎩 Update role"
 )
-async def update_role(role_id: RoleID, permission: list[Permission], access_token: str = Depends(oauth2_scheme)) -> Role:
+async def update_role(role_id: str, role_name: str, access_token: str = Depends(oauth2_scheme)) -> Role:
     pass
 
 
 @router.delete(
-    '/delete',
+    '/{role_id}/',
     response_model=Message,
     responses={
         401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
     },
     summary="🔓 🎩 Delete role by ID"
 )
-async def delete_role(role: RoleID, access_token: str = Depends(oauth2_scheme)) -> Message:
+async def delete_role(role_id: str, access_token: str = Depends(oauth2_scheme)) -> Message:
     pass
 
 
+# ------------------------- PERMISSIONS ---------------------------
+
+@router.post(
+    '/{role_id}/permission/{permission_id}',
+    response_model=Permission,
+    responses={
+        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
+    },
+    summary="🔓 🎩 Add permission to role"
+)
+async def create_permission(role_id: str, permission_id:str, access_token: str = Depends(oauth2_scheme)) -> Permission:
+    pass
+
+
+@router.delete(
+    '/{role_id}/permission/{permission_id}',
+    response_model=Message,
+    responses={
+        401: {'model': UnauthorizedError, 'description': 'Error: Unauthorized'},
+    },
+    summary="🔓 🎩 Delete permission from role"
+)
+async def delete_permission(role_id: str, permission_id:str,  access_token: str = Depends(oauth2_scheme)) -> Message:
+    pass
