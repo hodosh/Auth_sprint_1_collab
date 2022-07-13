@@ -1,9 +1,11 @@
-/.idea/misc.xml
-/.idea/modules.xml
-/.idea/inspectionProfiles/profiles_settings.xml
-/.idea/inspectionProfiles/Project_Default.xml
-/.idea/vcs.xml
+
 /.idea/Auth_sprint_1_collab.iml
+/.idea/workspace.xml
+/database/.env
+/flask_app/src/core/.env
+
+
+.idea/
 
 app/.DS_Store
 .DS_Store
@@ -136,3 +138,24 @@ dmypy.json
 .pyre/
 .idea/workspace.xml
 /database/data/
+
+
+
+report/
+contracts/rendered
+.DS_Store
+etl/app/etl/_state/etl_state.json
+/.idea/Async_API_sprint_1.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/.idea/.gitignore
+
+
+#  database data
+postgres/data/
+elastic_index/data
+
+tests/functional/results
+
