@@ -1,16 +1,12 @@
-/database/data/
+
 /.idea/Auth_sprint_1_collab.iml
-/.idea/misc.xml
-/.idea/modules.xml
-/.idea/inspectionProfiles/profiles_settings.xml
-/.idea/inspectionProfiles/Project_Default.xml
-/.idea/vcs.xml
 /.idea/workspace.xml
 /database/.env
 /flask_app/src/core/.env
 
 
 .idea/
+
 app/.DS_Store
 .DS_Store
 
@@ -140,6 +136,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.idea/workspace.xml
+/database/data/
+
 
 
 report/
@@ -159,3 +158,4 @@ postgres/data/
 elastic_index/data
 
 tests/functional/results
+
