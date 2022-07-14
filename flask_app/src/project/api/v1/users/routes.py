@@ -11,7 +11,7 @@ from project.models.models import (
     # RolePermission,
     # Permission,
 )
-from project.schemas import new_user_schema, user_schema, UserSchema, token_schema
+from project.schemas import new_user_schema, user_schema, UserSchema, token_schema, new_role_schema
 from . import users_api_blueprint
 
 
@@ -115,10 +115,11 @@ def get_user(user_id: str):
 
     return user
 
-# @users_api_blueprint.route('/<user_id>/permission', methods=['GET'])
+
+# @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['GET'])
 # @authenticate(token_auth)
-# @response(user_schema, 201)
-# def get_user_permissions(user_id: str):
+# @response(new_role_schema, 201)
+# def get_user_role(user_id: str, role_id: str):
 #     user_role = UserRole.query.filter_by(user_id=user_id).first()
 #     if not user_role:
 #         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no roles')
@@ -126,24 +127,6 @@ def get_user(user_id: str):
 #     role_permissions = RolePermission.filter_by(user_id=role)
 #     if not role_permissions:
 #         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no role with any permissions')
-#     permissions_list = [Permission(role_permission.permission_id for role_permission in role_permissions)]
+#     # permissions_list = [Permission(role_permission.name) for role_permission in role_permissions]
 #
-#     return permissions_list
-#
-#
-# @users_api_blueprint.route("/<user_id>/permission/<permission_id>", methods=["GET"])
-# @authenticate(token_auth)
-# @response(permission_schema, 201)
-# def get_user_permissions(kwargs):
-#     user_id = kwargs['user_id']
-#     permission_id = kwargs['permission_id']
-#     user_role = UserRole.query.filter_by(user_id=user_id).first()
-#     if not user_role:
-#         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no roles')
-#     role = Role.query.get(user_role.role_id)
-#     role_permission = RolePermission.filter_by(user_id=role, permission_id=permission_id)
-#     if not role_permission:
-#         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no permission with id={permission_id}')
-#     permission = Permission.get(role_permission.permission_id)
-#
-#     return permission
+#     return {'name': role, 'permissions': role_permissions}

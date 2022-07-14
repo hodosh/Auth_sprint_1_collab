@@ -60,37 +60,3 @@
 #     database.session.commit()
 #
 #     return role
-#
-#
-# @role_api_blueprint.route('/<role_id>/permission/<permission_id>', methods=['POST'])
-# @authenticate(token_auth)
-# @body(permission_schema)
-# @response(permission_schema, 200)
-# def add_permission(role_id: str, permission_id: str):
-#     role = Role.query.get(role_id)
-#     if not role:
-#         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
-#     permission = Permission.query.get(permission_id)
-#     if not permission:
-#         abort(HTTPStatus.NOT_FOUND, f'permission with permission_id={permission_id} not found')
-#
-#     # todo add permission to role
-#     database.session.commit()
-#     return role
-#
-#
-# @role_api_blueprint.route('/<role_id>/permission/<permission_id>', methods=['DELETE'])
-# @authenticate(token_auth)
-# @body(permission_schema)
-# @response(permission_schema, 200)
-# def remove_permission(role_id: str, permission_id: str):
-#     role = Role.query.get(role_id)
-#     if not role:
-#         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
-#     permission = Permission.query.get(permission_id)
-#     if not permission:
-#         abort(HTTPStatus.NOT_FOUND, f'permission with permission_id={permission_id} not found')
-#
-#     # todo remove permission from role
-#     database.session.commit()
-#     return role
