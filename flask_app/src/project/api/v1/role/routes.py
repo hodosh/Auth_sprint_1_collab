@@ -10,18 +10,18 @@
 #
 #
 # @role_api_blueprint.route('/', methods=['GET'])
-# @authenticate(token_auth)
+# # @jwt_required()
 # @response(ShortRoleSchema(many=True), 200)
 # def get_all_roles():
 #     roles = Role.query.order_by(Role.name).all()
 #     if not roles:
-#         abort(HTTPStatus.NOT_FOUND, f'roles not found')
+#         abort(HTTPStatus.NOT_FOUND, 'roles not found')
 #
 #     return roles
 #
 #
 # @role_api_blueprint.route('/<role_id>', methods=['GET'])
-# @authenticate(token_auth)
+# # @jwt_required()
 # @response(role_schema, 200)
 # def get_role(role_id: str):
 #     role = Role.query.get(role_id)
@@ -32,27 +32,27 @@
 #
 #
 # @role_api_blueprint.route('/<role_id>', methods=['POST'])
-# @authenticate(token_auth)
+# # @jwt_required()
 # @body(new_role_schema)
 # @response(role_schema, 200)
-# def update_role(role_id: str, kwargs: dict):
+# def update_role(kwargs: dict, role_id: str):
 #     name = kwargs['name']
 #     role = Role.query.get(role_id)
 #     if not role:
 #         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
 #     if name:
 #         role.name = name
-#
+#     # todo update permission list
 #     database.session.commit()
 #
 #     return role
 #
 #
 # @role_api_blueprint.route('/<role_id>', methods=['DELETE'])
-# @authenticate(token_auth)
+# # @jwt_required()
 # @body(new_role_schema)
 # @response(role_schema, 200)
-# def delete_role():
+# def delete_role(role_id: str):
 #     role = Role.query.get(role_id)
 #     if not role:
 #         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
