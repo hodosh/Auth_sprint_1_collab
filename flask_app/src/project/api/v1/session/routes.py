@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from apifairy import authenticate, body, other_responses, response
 from flask import abort
 
@@ -21,14 +23,16 @@ def get_auth_token():
 
 
 @session_api_blueprint.route('/refresh', methods=['POST'])
-@authenticate(basic_auth)
+# @jwt_required()
 @response(token_schema, 200)
 async def refresh_token_user():
     pass
 
 
-@session_api_blueprint.route('/history', methods=['GET'])
-@authenticate(basic_auth)
-@response(history_schema, 200)
-async def get_user_session_history():
-    pass
+# @session_api_blueprint.route('/history/<user_id>', methods=['GET'])
+# # @jwt_required()
+# @response(history_schema, 200)
+# async def get_user_session_history(user_id: str):
+#     user_history = UserHistory.query.get(user_id)
+#     if not user_history:
+#         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
