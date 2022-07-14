@@ -8,6 +8,14 @@ class NewUserSchema(ma.Schema):
     password_confirm = ma.String()
 
 
+class UpdateUserSchema(ma.Schema):
+    """Schema defining the attributes when creating a new user."""
+    email = ma.String()
+    old_password = ma.String()
+    new_password = ma.String()
+    new_password_confirm = ma.String()
+
+
 class UserSchema(ma.Schema):
     """Schema defining the attributes of a user."""
     id = ma.Integer()

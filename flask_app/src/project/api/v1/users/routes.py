@@ -10,7 +10,7 @@ from project.models.models import (
     # Role,
     # RolePermission,
 )
-from project.schemas import new_user_schema, user_schema, UserSchema, token_schema
+from project.schemas import new_user_schema, user_schema, UserSchema, token_schema, update_user_schema
 from . import users_api_blueprint
 
 
@@ -56,27 +56,31 @@ def register(kwargs):
 
 @users_api_blueprint.route('/<user_id>', methods=['POST'])
 # @jwt_required()
-@body(new_user_schema)
+@body(update_user_schema)
 @response(user_schema, 201)
-def update_user(user_id: str, kwargs):
+def update_user(kwargs, user_id: str):
     # todo обновлять может только суперюзер, тут надо сделать проверку прав
     # update self
     email = kwargs['email']
-    password = kwargs['password']
-    password_confirm = kwargs['password_confirm']
+    old_password = kwargs['old_password']
+    new_password = kwargs['new_password']
+    new_password_confirm = kwargs['new_password_confirm']
 
     user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
 
-    if not password:
-        abort(HTTPStatus.EXPECTATION_FAILED, 'password is not specified')
+    if not user.is_password_correct(old_password):
+        abort(HTTPStatus.EXPECTATION_FAILED, 'old password is incorrect')
 
-    if password != password_confirm:
+    if not new_password:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'new password is not specified')
+
+    if new_password != new_password_confirm:
         abort(HTTPStatus.EXPECTATION_FAILED, 'passwords do not match')
 
     user.email = email
-    user.set_password(password)
+    user.set_password(new_password)
     database.session.commit()
 
     return user
