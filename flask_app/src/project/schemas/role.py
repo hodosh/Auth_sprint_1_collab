@@ -11,10 +11,10 @@ class ShortRoleSchema(ma.Schema):
 
 class RoleSchema(ma.Schema):
     name = ma.String()
-    permissions = ma.List(PermissionSchema)
+    permissions = ma.List(ma.Nested(PermissionSchema))
     created = ma.DateTime()
 
 
 class NewRoleSchema(ma.Schema):
     name = ma.String()
-    permissions = ma.List(PermissionSchema)
+    permissions = ma.List(ma.Nested(PermissionSchema))
