@@ -9,9 +9,8 @@ from project.models.models import (
     # UserRole,
     # Role,
     # RolePermission,
-    # Permission,
 )
-from project.schemas import new_user_schema, user_schema, UserSchema, token_schema, new_role_schema
+from project.schemas import new_user_schema, user_schema, UserSchema, token_schema
 from . import users_api_blueprint
 
 
@@ -55,19 +54,20 @@ def register(kwargs):
     return new_user
 
 
-@users_api_blueprint.route('/', methods=['POST'])
-@authenticate(token_auth)
+@users_api_blueprint.route('/<user_id>', methods=['POST'])
+# @jwt_required()
 @body(new_user_schema)
 @response(user_schema, 201)
-def update_user(kwargs):
+def update_user(user_id: str, kwargs):
+    # todo обновлять может только суперюзер, тут надо сделать проверку прав
     # update self
     email = kwargs['email']
     password = kwargs['password']
     password_confirm = kwargs['password_confirm']
 
-    user = token_auth.current_user()
+    user = User.query.get(user_id)
     if not user:
-        abort(HTTPStatus.NOT_FOUND, f'user with email={email} not found')
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
 
     if not password:
         abort(HTTPStatus.EXPECTATION_FAILED, 'password is not specified')
@@ -82,31 +82,36 @@ def update_user(kwargs):
     return user
 
 
-@users_api_blueprint.route('/', methods=['DELETE'])
-@authenticate(token_auth)
+@users_api_blueprint.route('/<user_id>', methods=['DELETE'])
+# @jwt_required()
 @response(user_schema, 201)
-def delete_user():
-    user = token_auth.current_user()
+def delete_user(user_id: str):
+    # todo удалять может только суперюзер, тут надо сделать проверку прав
+    user = User.query.get(user_id)
+    if not user:
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
+    user_name = user.email
+
     user.delete()
     database.session.commit()
 
     # todo удалить сессию и токены
-    return user
+    return dict(head='delete user', body=f'user "{user_name}" removed successfully')
 
 
 @users_api_blueprint.route('/', methods=['GET'])
-@authenticate(token_auth)
+# @jwt_required()
 @response(UserSchema(many=True), 201)
 def get_all_users():
     users = User.query.order_by(User.email).all()
     if not users:
-        abort(HTTPStatus.NOT_FOUND, f'users not found')
+        abort(HTTPStatus.NOT_FOUND, 'users not found')
 
     return users
 
 
 @users_api_blueprint.route('/<user_id>', methods=['GET'])
-@authenticate(token_auth)
+# @jwt_required()
 @response(user_schema, 201)
 def get_user(user_id: str):
     user = User.query.get(user_id)
@@ -115,9 +120,8 @@ def get_user(user_id: str):
 
     return user
 
-
 # @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['GET'])
-# @authenticate(token_auth)
+# @jwt_required()
 # @response(new_role_schema, 201)
 # def get_user_role(user_id: str, role_id: str):
 #     user_role = UserRole.query.filter_by(user_id=user_id).first()
@@ -129,4 +133,4 @@ def get_user(user_id: str):
 #         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no role with any permissions')
 #     # permissions_list = [Permission(role_permission.name) for role_permission in role_permissions]
 #
-#     return {'name': role, 'permissions': role_permissions}
+#     return dict(name=role, permissions=role_permissions)
