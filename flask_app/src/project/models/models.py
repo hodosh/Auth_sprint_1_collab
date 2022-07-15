@@ -1,10 +1,10 @@
-import uuid
 import secrets
+import uuid
 from datetime import datetime, timedelta
 
 from sqlalchemy.dialects.postgresql import UUID
-from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.sql import func
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from project import database
 
@@ -179,8 +179,12 @@ class UserRole(IDMixin, CreatedMixin, database.Model):
                               nullable=False,
                               index=True)
 
+    def __init__(self, role_id: str, user_id: str):
+        self.role_id = role_id
+        self.user_id = user_id
+
     def __repr__(self):
-        return f'<User {self.value}>'
+        return f'<UserRole {self.id}>'
 
 
 class UserHistory(IDMixin, CreatedMixin, database.Model):
