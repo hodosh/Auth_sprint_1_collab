@@ -27,6 +27,7 @@ from project.schemas import (
     history_schema,
     user_role_schema,
 )
+from project.utils.history import log_activity
 from . import users_api_blueprint
 
 
@@ -46,6 +47,7 @@ def get_auth_token():
 @users_api_blueprint.route('/register', methods=['POST'])
 @body(new_user_schema)
 @response(user_schema, 201)
+@log_activity
 def register(kwargs):
     """Create a new user"""
     email = kwargs['email']
@@ -74,6 +76,7 @@ def register(kwargs):
 # @jwt_required()
 @body(update_user_schema)
 @response(user_schema, 201)
+@log_activity
 def update_user(kwargs, user_id: str):
     # todo обновлять может только суперюзер, тут надо сделать проверку прав
     # update self
@@ -105,6 +108,7 @@ def update_user(kwargs, user_id: str):
 @users_api_blueprint.route('/<user_id>', methods=['DELETE'])
 # @jwt_required()
 @response(user_schema, 200)
+@log_activity
 def delete_user(user_id: str):
     # todo удалять может только суперюзер, тут надо сделать проверку прав
     user = User.query.get(user_id)
@@ -121,6 +125,7 @@ def delete_user(user_id: str):
 @users_api_blueprint.route('/', methods=['GET'])
 # @jwt_required()
 @response(UserSchema(many=True), 200)
+@log_activity
 def get_all_users():
     users = User.query.order_by(User.email).all()
     if not users:
@@ -132,6 +137,7 @@ def get_all_users():
 @users_api_blueprint.route('/<user_id>', methods=['GET'])
 # @jwt_required()
 @response(user_schema, 200)
+@log_activity
 def get_user(user_id: str):
     user = User.query.get(user_id)
     if not user:
@@ -143,6 +149,7 @@ def get_user(user_id: str):
 @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['GET'])
 # @jwt_required()
 @response(new_role_schema, 200)
+@log_activity
 def get_user_role(user_id: str, role_id: str):
     user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).first()
     if not user_role:
@@ -159,6 +166,7 @@ def get_user_role(user_id: str, role_id: str):
 @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['PUT'])
 # @jwt_required()
 @response(user_role_schema, 200)
+@log_activity
 def set_user_role(user_id: str, role_id: str):
     user = User.query.get(user_id)
     if not user:
@@ -182,6 +190,7 @@ def set_user_role(user_id: str, role_id: str):
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 # @jwt_required()
 @response(history_schema, 200)
+@log_activity
 async def get_user_session_history(user_id: str):
     user_history = UserHistory.query.get(user_id)
     if not user_history:
