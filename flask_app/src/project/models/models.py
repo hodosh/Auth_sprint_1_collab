@@ -183,7 +183,7 @@ class UserRole(IDMixin, CreatedMixin, database.Model):
         return f'<User {self.value}>'
 
 
-class UserHistory(IDMixin, database.Model):
+class UserHistory(IDMixin, CreatedMixin, database.Model):
     __tablename__ = 'user_history'
 
     user_id = database.Column(UUID(as_uuid=True),
