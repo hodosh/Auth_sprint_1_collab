@@ -128,8 +128,12 @@ class Role(IDMixin, CreatedModifiedMixin, database.Model):
                                   secondary='user_role',
                                   back_populates='users')
 
+    def __init__(self, name: str):
+        """Create a new Role object."""
+        self.name = name
+
     def __repr__(self):
-        return f'<User {self.name}>'
+        return f'<Role {self.name}>'
 
 
 class Permission(IDMixin, database.Model):
@@ -142,7 +146,7 @@ class Permission(IDMixin, database.Model):
     roles = database.relationship('Permission', secondary='role_permission', back_populates='roles')
 
     def __repr__(self):
-        return f'<User {self.name}>'
+        return f'<Permission {self.name}>'
 
 
 class RolePermission(IDMixin, CreatedMixin, database.Model):
@@ -158,12 +162,18 @@ class RolePermission(IDMixin, CreatedMixin, database.Model):
                                     nullable=False,
                                     index=True)
 
-    value = database.Column(database.String,
-                            unique=True,
-                            nullable=False)
+    enabled = database.Column(database.Boolean,
+                              unique=True,
+                              nullable=False)
+
+    def __init__(self, role_id: str, permission_id: str, enabled: bool = True):
+        """Create a new RolePermission object."""
+        self.role_id = role_id
+        self.permission_id = permission_id
+        self.enabled = enabled
 
     def __repr__(self):
-        return f'<User {self.value}>'
+        return f'<RolePermission {self.id}>'
 
 
 class UserRole(IDMixin, CreatedMixin, database.Model):
@@ -199,5 +209,9 @@ class UserHistory(IDMixin, CreatedMixin, database.Model):
                                unique=True,
                                nullable=False)
 
+    def __init__(self, user_id: str, activity: str):
+        self.user_id = user_id
+        self.activity = activity
+
     def __repr__(self):
-        return f'<User {self.value}>'
+        return f'<UserHistory {self.id}>'
