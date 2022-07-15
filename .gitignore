@@ -159,3 +159,4 @@ elastic_index/data
 
 tests/functional/results
 
+.DS_Store

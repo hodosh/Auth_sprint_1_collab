@@ -1,17 +1,51 @@
-from project import database
+import uuid
 import secrets
 from datetime import datetime, timedelta
 
+from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.sql import func
+
+from project import database
 
 
-class Entry(database.Model):
+# ----------------
+# Mixin  Classes
+# ----------------
+
+
+class IDMixin(object):
+    id = database.Column(UUID(as_uuid=True),
+                         primary_key=True,
+                         default=uuid.uuid4,
+                         unique=True, nullable=False)
+
+
+class CreatedMixin(object):
+    created = database.Column(database.DateTime,
+                              default=func.now())
+
+
+class CreatedModifiedMixin(CreatedMixin):
+    modified = database.Column(database.DateTime,
+                               server_default=func.now(),
+                               onupdate=func.current_timestamp())
+
+
+# ----------------
+# Data  Classes
+# ----------------
+
+
+class Entry(IDMixin, database.Model):
     """Class that represents a journal entry."""
     __tablename__ = 'entries'
 
-    id = database.Column(database.Integer, primary_key=True)
-    entry = database.Column(database.String, nullable=False)
-    user_id = database.Column(database.Integer, database.ForeignKey('users.id'))
+    entry = database.Column(database.String,
+                            nullable=False)
+
+    user_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('users.id'))
 
     def __init__(self, entry: str):
         self.entry = entry
@@ -23,15 +57,28 @@ class Entry(database.Model):
         return f'<Entry: {self.entry}>'
 
 
-class User(database.Model):
+class User(IDMixin, CreatedModifiedMixin, database.Model):
     __tablename__ = 'users'
 
-    id = database.Column(database.Integer, primary_key=True)
-    email = database.Column(database.String, unique=True, nullable=False)
-    password_hashed = database.Column(database.String(128), nullable=False)
-    entries = database.relationship('Entry', backref='user', lazy='dynamic')
-    auth_token = database.Column(database.String(64), index=True)
+    email = database.Column(database.String,
+                            unique=True,
+                            nullable=False)
+
+    password_hashed = database.Column(database.String(128),
+                                      nullable=False)
+
+    entries = database.relationship('Entry',
+                                    backref='user',
+                                    lazy='dynamic')
+
+    auth_token = database.Column(database.String(64),
+                                 index=True)
+
     auth_token_expiration = database.Column(database.DateTime)
+
+    roles = database.relationship('Role',
+                                  secondary='role_permission',
+                                  back_populates='roles')
 
     def __init__(self, email: str, password_plaintext: str):
         """Create a new User object."""
@@ -64,3 +111,89 @@ class User(database.Model):
 
     def __repr__(self):
         return f'<User: {self.email}>'
+
+
+class Role(IDMixin, CreatedModifiedMixin, database.Model):
+    __tablename__ = 'roles'
+
+    name = database.Column(database.String,
+                           unique=True,
+                           nullable=False)
+
+    permissions = database.relationship('Permission',
+                                        secondary='role_permission',
+                                        back_populates='permissions')
+
+    users = database.relationship('User',
+                                  secondary='user_role',
+                                  back_populates='users')
+
+    def __repr__(self):
+        return f'<User {self.name}>'
+
+
+class Permission(IDMixin, database.Model):
+    __tablename__ = 'permissions'
+
+    name = database.Column(database.String,
+                           unique=True,
+                           nullable=False)
+
+    roles = database.relationship('Permission', secondary='role_permission', back_populates='roles')
+
+    def __repr__(self):
+        return f'<User {self.name}>'
+
+
+class RolePermission(IDMixin, CreatedMixin, database.Model):
+    __tablename__ = 'role_permission'
+
+    role_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('roles.id'),
+                              nullable=False,
+                              index=True)
+
+    permission_id = database.Column(UUID(as_uuid=True),
+                                    database.ForeignKey('permissions.id'),
+                                    nullable=False,
+                                    index=True)
+
+    value = database.Column(database.String,
+                            unique=True,
+                            nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.value}>'
+
+
+class UserRole(IDMixin, CreatedMixin, database.Model):
+    __tablename__ = 'user_role'
+
+    role_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('roles.id'),
+                              nullable=False,
+                              index=True)
+
+    user_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('users.id'),
+                              nullable=False,
+                              index=True)
+
+    def __repr__(self):
+        return f'<User {self.value}>'
+
+
+class UserHistory(IDMixin, database.Model):
+    __tablename__ = 'user_history'
+
+    user_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('users.id', ondelete='CASCADE'),
+                              nullable=False,
+                              index=True)
+
+    activity = database.Column(database.String,
+                               unique=True,
+                               nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.value}>'
