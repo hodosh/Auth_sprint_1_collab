@@ -35,28 +35,6 @@ class CreatedModifiedMixin(CreatedMixin):
 # ----------------
 # Data  Classes
 # ----------------
-
-
-class Entry(IDMixin, database.Model):
-    """Class that represents a journal entry."""
-    __tablename__ = 'entries'
-
-    entry = database.Column(database.String,
-                            nullable=False)
-
-    user_id = database.Column(UUID(as_uuid=True),
-                              database.ForeignKey('users.id'))
-
-    def __init__(self, entry: str):
-        self.entry = entry
-
-    def update(self, entry: str):
-        self.entry = entry
-
-    def __repr__(self):
-        return f'<Entry: {self.entry}>'
-
-
 class User(IDMixin, CreatedModifiedMixin, database.Model):
     __tablename__ = 'users'
 
