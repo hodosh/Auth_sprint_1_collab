@@ -69,13 +69,13 @@ def initialize_extensions(app):
 
 def register_blueprints(app):
     # Import the blueprints
-    from project.api.v1.journal import journal_api_blueprint
+    from project.api.v1.role import role_api_blueprint
     from project.api.v1.users import users_api_blueprint
 
     # Since the application instance is now created, register each Blueprint
     # with the Flask application instance (app)
-    app.register_blueprint(journal_api_blueprint, url_prefix='/api/v1/journal')
     app.register_blueprint(users_api_blueprint, url_prefix='/api/v1/users')
+    app.register_blueprint(role_api_blueprint, url_prefix='/api/v1/roles')
 
 
 def register_error_handlers(app):
