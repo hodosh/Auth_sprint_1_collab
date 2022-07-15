@@ -14,7 +14,8 @@ from project.models.models import (
     UserRole,
     Role,
     RolePermission,
-    Permission, UserHistory,
+    Permission,
+    UserHistory,
 )
 from project.schemas import (
     new_user_schema,
@@ -22,7 +23,9 @@ from project.schemas import (
     UserSchema,
     token_schema,
     update_user_schema,
-    new_role_schema, history_schema,
+    new_role_schema,
+    history_schema,
+    user_role_schema,
 )
 from . import users_api_blueprint
 
@@ -153,6 +156,29 @@ def get_user_role(user_id: str, role_id: str):
     return dict(name=role.name, permissions=permissions_list)
 
 
+@users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['PUT'])
+# @jwt_required()
+@response(user_role_schema, 200)
+def set_user_role(user_id: str, role_id: str):
+    user = User.query.get(user_id)
+    if not user:
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
+
+    role = Role.query.get(role_id)
+    if not role:
+        abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
+
+    user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).first()
+    if not user_role:
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} and role_id={role_id} not found')
+
+    user_role = UserRole(role_id=role_id, user_id=user_id)
+    database.session.add(user_role)
+    database.session.commit()
+
+    return user_role
+
+
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 # @jwt_required()
 @response(history_schema, 200)
@@ -160,4 +186,5 @@ async def get_user_session_history(user_id: str):
     user_history = UserHistory.query.get(user_id)
     if not user_history:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
+
     return user_history
