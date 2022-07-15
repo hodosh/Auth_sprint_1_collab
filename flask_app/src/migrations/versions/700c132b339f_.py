@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: fd69d46654f6
+Revision ID: 700c132b339f
 Revises: 
-Create Date: 2022-07-15 21:04:32.761853
+Create Date: 2022-07-15 23:59:40.777780
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'fd69d46654f6'
+revision = '700c132b339f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -47,30 +47,23 @@ def upgrade():
     sa.UniqueConstraint('id')
     )
     op.create_index(op.f('ix_users_auth_token'), 'users', ['auth_token'], unique=False)
-    op.create_table('entries',
-    sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
-    sa.Column('entry', sa.String(), nullable=False),
-    sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id')
-    )
     op.create_table('role_permission',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('role_id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('permission_id', postgresql.UUID(as_uuid=True), nullable=False),
-    sa.Column('value', sa.String(), nullable=False),
+    sa.Column('enabled', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['permission_id'], ['permissions.id'], ),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id'),
-    sa.UniqueConstraint('value')
+    sa.UniqueConstraint('enabled'),
+    sa.UniqueConstraint('id')
     )
     op.create_index(op.f('ix_role_permission_permission_id'), 'role_permission', ['permission_id'], unique=False)
     op.create_index(op.f('ix_role_permission_role_id'), 'role_permission', ['role_id'], unique=False)
     op.create_table('user_history',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
+    sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('activity', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
@@ -104,7 +97,6 @@ def downgrade():
     op.drop_index(op.f('ix_role_permission_role_id'), table_name='role_permission')
     op.drop_index(op.f('ix_role_permission_permission_id'), table_name='role_permission')
     op.drop_table('role_permission')
-    op.drop_table('entries')
     op.drop_index(op.f('ix_users_auth_token'), table_name='users')
     op.drop_table('users')
     op.drop_table('roles')
