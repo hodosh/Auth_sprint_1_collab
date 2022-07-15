@@ -18,5 +18,11 @@ class UpdateUserSchema(ma.Schema):
 
 class UserSchema(ma.Schema):
     """Schema defining the attributes of a user."""
-    id = ma.Integer()
+    id = ma.String()
     email = ma.String()
+
+
+class UserRole(ma.Schema):
+    """Schema defining the attributes of a user."""
+    user_id = ma.String()
+    role_id = ma.String()
