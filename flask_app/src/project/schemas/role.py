@@ -24,6 +24,5 @@ class RoleSchema(ma.Schema):
 
 
 class NewRoleSchema(ma.Schema):
-    id = ma.String()
     name = ma.String()
     permissions = ma.List(ma.Nested(NestedPermissionSchema))

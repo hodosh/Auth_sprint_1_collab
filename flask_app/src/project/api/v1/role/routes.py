@@ -4,7 +4,7 @@ from apifairy import response, body
 from flask import abort
 
 from project import database
-from project.models.models import Role, Permission, RolePermission
+from project.models.models import Role, RolePermission
 from project.schemas import role_schema, new_role_schema
 from project.schemas.role import ShortRoleSchema
 from . import role_api_blueprint
@@ -24,6 +24,7 @@ def create_role(kwargs: dict):
     role = Role(name=name)
 
     database.session.add(role)
+    database.session.commit()
 
     RolePermission.set_permissions_to_role(role.id, permissions)
 
