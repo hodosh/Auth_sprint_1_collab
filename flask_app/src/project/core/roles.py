@@ -31,7 +31,6 @@ SUPERUSER_ROLE = {
     PERMISSION.DELETE: True
 }
 
-
 USER_ROLE = {
     USER_SELF.READ: True,
     USER_SELF.CREATE: True,
@@ -62,7 +61,6 @@ USER_ROLE = {
     PERMISSION.UPDATE: False,
     PERMISSION.DELETE: False
 }
-
 
 NON_REGISTERED = {
     USER_SELF.READ: True,
@@ -95,8 +93,7 @@ NON_REGISTERED = {
     PERMISSION.DELETE: False
 }
 
-
-USER_ROLES = {
+DEFAULT_ROLES = {
     "superuser": SUPERUSER_ROLE,
     "user": USER_ROLE,
     "non_registered": NON_REGISTERED

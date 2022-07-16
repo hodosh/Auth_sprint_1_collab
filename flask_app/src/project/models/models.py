@@ -152,16 +152,13 @@ class RolePermission(IDMixin, CreatedMixin, database.Model):
 
     role_id = database.Column(UUID(as_uuid=True),
                               database.ForeignKey('roles.id'),
-                              nullable=False,
-                              index=True)
+                              nullable=False)
 
     permission_id = database.Column(UUID(as_uuid=True),
                                     database.ForeignKey('permissions.id'),
-                                    nullable=False,
-                                    index=True)
+                                    nullable=False)
 
     value = database.Column(database.String,
-                            unique=True,
                             nullable=False)
 
     # __table_args__ = (database.UniqueConstraint(role_id, permission_id),)

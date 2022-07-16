@@ -9,7 +9,7 @@ from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 
 from project.core import config
-from project.cli.superuser import create_superuser
+
 
 # -------------
 # Configuration
@@ -101,6 +101,9 @@ def register_error_handlers(app):
 
 
 def register_cli_command(app):
+    from project.cli.superuser import create_superuser
+    from project.cli.default_roles import create_default
+
     create_cli = AppGroup('create')
 
     @create_cli.command('superuser')
@@ -109,6 +112,6 @@ def register_cli_command(app):
 
     @create_cli.command('roles')
     def create_roles():
-        pass
+        create_default()
 
     app.cli.add_command(create_cli)

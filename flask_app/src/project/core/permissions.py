@@ -1,6 +1,11 @@
 import enum
 
 
+class Hashable(enum.Enum):
+    def __hash__(self):
+        return hash(str(self))
+
+
 @enum.unique
 class USER_SELF(enum.Enum):
     READ = "user_self_read"
@@ -30,11 +35,11 @@ class ROLE_SELF(enum.Enum):
 
 @enum.unique
 class ROLE_ALL(enum.Enum):
-    READ = "role_self_read"
-    CREATE = "role_self_create"
-    UPDATE = "role_self_update"
-    DELETE = "role_self_delete"
-    SET_PERMIT = "role_self_set_permit"
+    READ = "role_all_read"
+    CREATE = "role_all_create"
+    UPDATE = "role_all_update"
+    DELETE = "role_all_delete"
+    SET_PERMIT = "role_all_set_permit"
 
 
 @enum.unique
@@ -44,3 +49,11 @@ class PERMISSION(enum.Enum):
     UPDATE = "permission_update"
     DELETE = "permission_delete"
 
+
+DEFAULT_PERMISSIONS = {
+    "user_self": USER_SELF,
+    "user_all": USER_ALL,
+    "role_self": ROLE_SELF,
+    "role_all": ROLE_ALL,
+    "permission": PERMISSION
+}
