@@ -47,6 +47,11 @@ class User(IDMixin, CreatedModifiedMixin, database.Model):
 
     disabled = database.Column(database.Boolean, nullable=False)
 
+    role_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('roles.id'),
+                              nullable=True,
+                              index=True)
+
     auth_token = database.Column(database.String(64),
                                  index=True)
 
@@ -102,6 +107,11 @@ class Role(IDMixin, CreatedModifiedMixin, database.Model):
     name = database.Column(database.String,
                            unique=True,
                            nullable=False)
+
+    user_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('users.id'),
+                              nullable=True,
+                              index=True)
 
     # permissions = database.relationship('Permission',
     #                                     secondary='role_permission',
@@ -159,25 +169,25 @@ class RolePermission(IDMixin, CreatedMixin, database.Model):
         return f'<RolePermission {self.id}>'
 
 
-class UserRole(IDMixin, CreatedMixin, database.Model):
-    __tablename__ = 'user_role'
-
-    role_id = database.Column(UUID(as_uuid=True),
-                              database.ForeignKey('roles.id'),
-                              nullable=False,
-                              index=True)
-
-    user_id = database.Column(UUID(as_uuid=True),
-                              database.ForeignKey('users.id'),
-                              nullable=False,
-                              index=True)
-
-    def __init__(self, role_id: str, user_id: str):
-        self.role_id = role_id
-        self.user_id = user_id
-
-    def __repr__(self):
-        return f'<UserRole {self.id}>'
+# class UserRole(IDMixin, CreatedMixin, database.Model):
+#     __tablename__ = 'user_role'
+#
+#     role_id = database.Column(UUID(as_uuid=True),
+#                               database.ForeignKey('roles.id'),
+#                               nullable=False,
+#                               index=True)
+#
+#     user_id = database.Column(UUID(as_uuid=True),
+#                               database.ForeignKey('users.id'),
+#                               nullable=False,
+#                               index=True)
+#
+#     def __init__(self, role_id: str, user_id: str):
+#         self.role_id = role_id
+#         self.user_id = user_id
+#
+#     def __repr__(self):
+#         return f'<UserRole {self.id}>'
 
 
 class UserHistory(IDMixin, CreatedMixin, database.Model):

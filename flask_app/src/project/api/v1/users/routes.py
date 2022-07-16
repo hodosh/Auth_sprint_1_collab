@@ -11,7 +11,6 @@ from flask import abort
 from project import database, basic_auth
 from project.models.models import (
     User,
-    UserRole,
     Role,
     RolePermission,
     Permission,
@@ -151,14 +150,20 @@ def get_user(user_id: str):
 @response(new_role_schema, 200)
 # @log_activity
 def get_user_role(user_id: str):
-    user_role = UserRole.query.filter_by(user_id=user_id).first()
-    if not user_role:
+    user = User.query.get(user_id).first()
+    if not user:
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
+
+    role_id = user.role_id
+    if not role_id:
         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} has no any role')
-    role_permissions = RolePermission.query.filter_by(role_id=user_role.role_id)
+
+    role_permissions = RolePermission.query.filter_by(role_id=role_id)
     if not role_permissions:
-        abort(HTTPStatus.NOT_FOUND, f'role with id={user_role.role_id} have no any permissions')
+        abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} have no any permissions')
+
     permissions_list = [Permission.query.get(role_permission.permission_id) for role_permission in role_permissions]
-    role = Role.query.get(user_role.role_id)
+    role = Role.query.get(role_id)
 
     return dict(name=role.name, permissions=permissions_list)
 
@@ -176,19 +181,14 @@ def set_user_role(user_id: str, role_id: str):
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} not found')
 
-    user_role = UserRole.query.filter_by(user_id=user_id).first()
-    if user_role:
-        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} already has role')
+    user_role_id = user.role_id
+    if user_role_id == role_id:
+        abort(HTTPStatus.EXPECTATION_FAILED, f'user with id={user_id} already has role with id={role_id}')
 
-    user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).first()
-    if user_role:
-        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} already has role with id={role_id}')
-
-    user_role = UserRole(role_id=role_id, user_id=user_id)
-    database.session.add(user_role)
+    user.role_id = role_id
     database.session.commit()
 
-    return user_role
+    return user
 
 
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
