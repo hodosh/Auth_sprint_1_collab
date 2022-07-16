@@ -67,18 +67,21 @@ class User(IDMixin, CreatedModifiedMixin, database.Model):
     password_hashed = database.Column(database.String(128),
                                       nullable=False)
 
-    entries = database.relationship('Entry',
-                                    backref='user',
-                                    lazy='dynamic')
-
     auth_token = database.Column(database.String(64),
                                  index=True)
 
     auth_token_expiration = database.Column(database.DateTime)
 
-    roles = database.relationship('Role',
-                                  secondary='role_permission',
-                                  back_populates='roles')
+    disabled = database.Column(database.Boolean,
+                               nullable=False,
+                               default=False)
+
+    role_id = database.Column(UUID(as_uuid=True),
+                              database.ForeignKey('roles.id'))
+
+    entries = database.relationship('Entry',
+                                    backref='user',
+                                    lazy='dynamic')
 
     def __init__(self, email: str, password_plaintext: str):
         """Create a new User object."""
@@ -120,13 +123,11 @@ class Role(IDMixin, CreatedModifiedMixin, database.Model):
                            unique=True,
                            nullable=False)
 
-    permissions = database.relationship('Permission',
-                                        secondary='role_permission',
-                                        back_populates='permissions')
-
-    users = database.relationship('User',
-                                  secondary='user_role',
-                                  back_populates='users')
+    # role_permission = database.relationship("RolePermission",
+    #                                         back_populates="roles")
+    #
+    # users = database.relationship('User',
+    #                               back_populates='roles')
 
     def __repr__(self):
         return f'<User {self.name}>'
@@ -139,7 +140,8 @@ class Permission(IDMixin, database.Model):
                            unique=True,
                            nullable=False)
 
-    roles = database.relationship('Permission', secondary='role_permission', back_populates='roles')
+    # role_permission = database.relationship("RolePermission",
+    #                                         back_populates="permissions")
 
     def __repr__(self):
         return f'<User {self.name}>'
@@ -162,22 +164,13 @@ class RolePermission(IDMixin, CreatedMixin, database.Model):
                             unique=True,
                             nullable=False)
 
-    def __repr__(self):
-        return f'<User {self.value}>'
-
-
-class UserRole(IDMixin, CreatedMixin, database.Model):
-    __tablename__ = 'user_role'
-
-    role_id = database.Column(UUID(as_uuid=True),
-                              database.ForeignKey('roles.id'),
-                              nullable=False,
-                              index=True)
-
-    user_id = database.Column(UUID(as_uuid=True),
-                              database.ForeignKey('users.id'),
-                              nullable=False,
-                              index=True)
+    # __table_args__ = (database.UniqueConstraint(role_id, permission_id),)
+    #
+    # permission = database.relationship("Permission",
+    #                                    back_populates="role_permission")
+    #
+    # role = database.relationship("Role",
+    #                              back_populates="role_permission")
 
     def __repr__(self):
         return f'<User {self.value}>'
