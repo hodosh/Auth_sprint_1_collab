@@ -96,7 +96,7 @@ NON_REGISTERED = {
 }
 
 
-USER_ROLE = {
+USER_ROLES = {
     "superuser": SUPERUSER_ROLE,
     "user": USER_ROLE,
     "non_registered": NON_REGISTERED

@@ -43,3 +43,4 @@ class PERMISSION(enum.Enum):
     CREATE = "permission_create"
     UPDATE = "permission_update"
     DELETE = "permission_delete"
+
