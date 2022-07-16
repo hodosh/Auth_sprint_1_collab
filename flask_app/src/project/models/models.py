@@ -1,10 +1,12 @@
 import secrets
 import uuid
 from datetime import datetime, timedelta
+from http import HTTPStatus
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask import abort
 
 from project import database
 
@@ -142,6 +144,17 @@ class RolePermission(IDMixin, CreatedMixin, database.Model):
         self.role_id = role_id
         self.permission_id = permission_id
         self.value = value
+
+    @staticmethod
+    def set_permissions_to_role(role_id: str, permission_list: list):
+        for permission_dict in permission_list:
+            permission_id = permission_dict['id']
+            permission_value = permission_dict.get('value', 'true')
+            permission = Permission.query.get(permission_id)
+            if not permission:
+                abort(HTTPStatus.NOT_FOUND, f'permission with id={permission_id} not found')
+            role_permission = RolePermission(role_id=role_id, permission_id=permission_id, value=permission_value)
+            database.session.add(role_permission)
 
     def __repr__(self):
         return f'<RolePermission {self.id}>'

@@ -7,7 +7,6 @@ from project import database
 from project.models.models import Role, Permission, RolePermission
 from project.schemas import role_schema, new_role_schema
 from project.schemas.role import ShortRoleSchema
-from project.utils.history import log_activity
 from . import role_api_blueprint
 
 
@@ -18,7 +17,7 @@ from . import role_api_blueprint
 # @log_activity
 def create_role(kwargs: dict):
     name = kwargs['name']
-    permission_list = kwargs['permissions']
+    permissions = kwargs['permissions']
     role = Role.query.filter_by(name=name).first()
     if role:
         abort(HTTPStatus.EXPECTATION_FAILED, f'role with name={name} exists')
@@ -26,10 +25,7 @@ def create_role(kwargs: dict):
 
     database.session.add(role)
 
-    for name in permission_list.split(';'):
-        permission = Permission.query.filter_by(name=name).first()
-        role_permission = RolePermission(role_id=role.id, permission_id=permission.id)
-        database.session.add(role_permission)
+    RolePermission.set_permissions_to_role(role.id, permissions)
 
     database.session.commit()
 
@@ -51,10 +47,7 @@ def update_role(kwargs: dict, role_id: str):
         role.name = name
 
     if permission_list:
-        for name in permission_list.split(';'):
-            permission = Permission.query.filter_by(name=name).first()
-            role_permission = RolePermission(role_id=role.id, permission_id=permission.id)
-            database.session.add(role_permission)
+        RolePermission.set_permissions_to_role(role.id, permission_list)
 
     database.session.commit()
 
