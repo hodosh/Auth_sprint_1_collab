@@ -1,5 +1,7 @@
 from apifairy import APIFairy
 from flask import Flask, json
+import click
+from flask.cli import AppGroup
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
@@ -7,6 +9,8 @@ from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 
 from project.core import config
+
+
 # -------------
 # Configuration
 # -------------
@@ -20,6 +24,7 @@ database = SQLAlchemy()
 migrate = Migrate()
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
+
 
 # ------------
 
@@ -48,6 +53,7 @@ def create_app():
     initialize_extensions(app)
     register_blueprints(app)
     register_error_handlers(app)
+    register_cli_command(app)
 
     return app
 
@@ -92,3 +98,20 @@ def register_error_handlers(app):
         })
         response.content_type = 'application/json'
         return response
+
+
+def register_cli_command(app):
+    from project.cli.superuser import create_superuser
+    from project.cli.default_roles import create_default
+
+    create_cli = AppGroup('create')
+
+    @create_cli.command('superuser')
+    def create_user():
+        create_superuser()
+
+    @create_cli.command('roles')
+    def create_roles():
+        create_default()
+
+    app.cli.add_command(create_cli)
