@@ -1,11 +1,6 @@
 import enum
 
 
-class Hashable(enum.Enum):
-    def __hash__(self):
-        return hash(str(self))
-
-
 @enum.unique
 class USER_SELF(enum.Enum):
     READ = "user_self_read"
