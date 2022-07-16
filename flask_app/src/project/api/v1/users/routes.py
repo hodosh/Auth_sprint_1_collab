@@ -1,16 +1,31 @@
 from http import HTTPStatus
 
-from apifairy import authenticate, body, response, other_responses
+from apifairy import (
+    authenticate,
+    body,
+    response,
+    other_responses,
+)
 from flask import abort
 
-from project import database, token_auth, basic_auth
+from project import database, basic_auth
 from project.models.models import (
     User,
-    # UserRole,
-    # Role,
-    # RolePermission,
+    Role,
+    RolePermission,
+    Permission,
+    UserHistory,
 )
-from project.schemas import new_user_schema, user_schema, UserSchema, token_schema, update_user_schema
+from project.schemas import (
+    new_user_schema,
+    user_schema,
+    UserSchema,
+    token_schema,
+    update_user_schema,
+    new_role_schema,
+    history_schema,
+    user_role_schema,
+)
 from . import users_api_blueprint
 
 
@@ -30,6 +45,7 @@ def get_auth_token():
 @users_api_blueprint.route('/register', methods=['POST'])
 @body(new_user_schema)
 @response(user_schema, 201)
+# @log_activity
 def register(kwargs):
     """Create a new user"""
     email = kwargs['email']
@@ -58,6 +74,7 @@ def register(kwargs):
 # @jwt_required()
 @body(update_user_schema)
 @response(user_schema, 201)
+# @log_activity
 def update_user(kwargs, user_id: str):
     # todo обновлять может только суперюзер, тут надо сделать проверку прав
     # update self
@@ -81,6 +98,7 @@ def update_user(kwargs, user_id: str):
 
     user.email = email
     user.set_password(new_password)
+
     database.session.commit()
 
     return user
@@ -88,24 +106,25 @@ def update_user(kwargs, user_id: str):
 
 @users_api_blueprint.route('/<user_id>', methods=['DELETE'])
 # @jwt_required()
-@response(user_schema, 201)
-def delete_user(user_id: str):
+@response(user_schema, 200)
+# @log_activity
+def disable_user(user_id: str):
     # todo удалять может только суперюзер, тут надо сделать проверку прав
     user = User.query.get(user_id)
-    if not user:
-        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
-    user_name = user.email
+    if not user.is_enabled():
+        abort(HTTPStatus.EXPECTATION_FAILED, f'user with user_id={user_id} is already disabled')
 
-    user.delete()
+    user.disable()
     database.session.commit()
 
     # todo удалить сессию и токены
-    return dict(head='delete user', body=f'user "{user_name}" removed successfully')
+    return user
 
 
 @users_api_blueprint.route('/', methods=['GET'])
 # @jwt_required()
-@response(UserSchema(many=True), 201)
+@response(UserSchema(many=True), 200)
+# @log_activity
 def get_all_users():
     users = User.query.order_by(User.email).all()
     if not users:
@@ -116,7 +135,8 @@ def get_all_users():
 
 @users_api_blueprint.route('/<user_id>', methods=['GET'])
 # @jwt_required()
-@response(user_schema, 201)
+@response(user_schema, 200)
+# @log_activity
 def get_user(user_id: str):
     user = User.query.get(user_id)
     if not user:
@@ -124,17 +144,60 @@ def get_user(user_id: str):
 
     return user
 
-# @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['GET'])
+
+@users_api_blueprint.route('/<user_id>/role', methods=['GET'])
 # @jwt_required()
-# @response(new_role_schema, 201)
-# def get_user_role(user_id: str, role_id: str):
-#     user_role = UserRole.query.filter_by(user_id=user_id).first()
-#     if not user_role:
-#         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no roles')
-#     role = Role.query.get(user_role.role_id)
-#     role_permissions = RolePermission.filter_by(user_id=role)
-#     if not role_permissions:
-#         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no role with any permissions')
-#     # permissions_list = [Permission(role_permission.name) for role_permission in role_permissions]
-#
-#     return dict(name=role, permissions=role_permissions)
+@response(new_role_schema, 200)
+# @log_activity
+def get_user_role(user_id: str):
+    user = User.query.get(user_id).first()
+    if not user:
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
+
+    role_id = user.role_id
+    if not role_id:
+        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} has no any role')
+
+    role_permissions = RolePermission.query.filter_by(role_id=role_id)
+    if not role_permissions:
+        abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} have no any permissions')
+
+    permissions_list = [Permission.query.get(role_permission.permission_id) for role_permission in role_permissions]
+    role = Role.query.get(role_id)
+
+    return dict(name=role.name, permissions=permissions_list)
+
+
+@users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['PUT'])
+# @jwt_required()
+@response(user_role_schema, 200)
+# @log_activity
+def set_user_role(user_id: str, role_id: str):
+    user = User.query.get(user_id)
+    if not user:
+        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} not found')
+
+    role = Role.query.get(role_id)
+    if not role:
+        abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} not found')
+
+    user_role_id = user.role_id
+    if user_role_id == role_id:
+        abort(HTTPStatus.EXPECTATION_FAILED, f'user with id={user_id} already has role with id={role_id}')
+
+    user.role_id = role_id
+    database.session.commit()
+
+    return user
+
+
+@users_api_blueprint.route('/<user_id>/history', methods=['GET'])
+# @jwt_required()
+@response(history_schema, 200)
+# @log_activity
+async def get_user_session_history(user_id: str):
+    user_history = UserHistory.query.get(user_id)
+    if not user_history:
+        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
+
+    return user_history
