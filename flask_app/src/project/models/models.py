@@ -57,10 +57,6 @@ class User(IDMixin, CreatedModifiedMixin, database.Model):
     role_id = database.Column(UUID(as_uuid=True),
                               database.ForeignKey('roles.id'))
 
-    entries = database.relationship('Entry',
-                                    backref='user',
-                                    lazy='dynamic')
-
     def __init__(self, email: str, password_plaintext: str, disabled: bool = False):
         """Create a new User object."""
         self.email = email
