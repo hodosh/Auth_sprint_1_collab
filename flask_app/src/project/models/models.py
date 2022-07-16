@@ -45,10 +45,6 @@ class User(IDMixin, CreatedModifiedMixin, database.Model):
     password_hashed = database.Column(database.String(128),
                                       nullable=False)
 
-    entries = database.relationship('Entry',
-                                    backref='user',
-                                    lazy='dynamic')
-
     auth_token = database.Column(database.String(64),
                                  index=True)
 
