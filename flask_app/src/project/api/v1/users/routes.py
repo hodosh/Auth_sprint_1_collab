@@ -26,12 +26,14 @@ from project.schemas import (
     history_schema,
     user_role_schema,
 )
+from project.utils.history import log_activity
 from . import users_api_blueprint
 
 
 @users_api_blueprint.route('/get-auth-token', methods=['POST'])
 @authenticate(basic_auth)
 @response(token_schema)
+@log_activity
 @other_responses({401: 'Invalid username or password'})
 def get_auth_token():
     """Get authentication token"""
