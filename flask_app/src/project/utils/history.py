@@ -1,5 +1,5 @@
 from project import database, token_auth
-from project.models.models import User, UserHistory
+from project.models.models import UserHistory
 
 
 def log_activity(func):

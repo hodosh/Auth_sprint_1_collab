@@ -14,7 +14,6 @@ from . import role_api_blueprint
 # @jwt_required()
 @body(new_role_schema)
 @response(role_schema, 200)
-# @log_activity
 def create_role(kwargs: dict):
     name = kwargs['name']
     permissions = kwargs['permissions']
@@ -37,7 +36,6 @@ def create_role(kwargs: dict):
 # @jwt_required()
 @body(new_role_schema)
 @response(role_schema, 200)
-# @log_activity
 def update_role(kwargs: dict, role_id: str):
     name = kwargs['name']
     role = Role.query.get(role_id)
@@ -58,7 +56,6 @@ def update_role(kwargs: dict, role_id: str):
 @role_api_blueprint.route('/', methods=['GET'])
 # @jwt_required()
 @response(ShortRoleSchema(many=True), 200)
-# @log_activity
 def get_all_roles():
     roles = Role.query.order_by(Role.name).all()
     if not roles:
@@ -70,7 +67,6 @@ def get_all_roles():
 @role_api_blueprint.route('/<role_id>', methods=['GET'])
 # @jwt_required()
 @response(role_schema, 200)
-# @log_activity
 def get_role(role_id: str):
     role = Role.query.get(role_id)
     if not role:
@@ -83,7 +79,6 @@ def get_role(role_id: str):
 # @jwt_required()
 @body(new_role_schema)
 @response(role_schema, 200)
-# @log_activity
 def delete_role(role_id: str):
     role = Role.query.get(role_id)
     if not role:
