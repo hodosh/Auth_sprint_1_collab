@@ -27,7 +27,6 @@ from project.schemas import (
     history_schema,
     user_role_schema,
 )
-from project.utils.history import log_activity
 from . import users_api_blueprint
 
 
@@ -100,6 +99,7 @@ def update_user(kwargs, user_id: str):
 
     user.email = email
     user.set_password(new_password)
+
     database.session.commit()
 
     return user
@@ -109,17 +109,17 @@ def update_user(kwargs, user_id: str):
 # @jwt_required()
 @response(user_schema, 200)
 # @log_activity
-def delete_user(user_id: str):
+def disable_user(user_id: str):
     # todo удалять может только суперюзер, тут надо сделать проверку прав
     user = User.query.get(user_id)
-    if not user:
-        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
+    if not user.is_enabled():
+        abort(HTTPStatus.EXPECTATION_FAILED, f'user with user_id={user_id} is already disabled')
 
-    user.delete()
+    user.disable()
     database.session.commit()
 
     # todo удалить сессию и токены
-    return dict(head='delete user', body=f'user with user_id={user_id} removed successfully')
+    return user
 
 
 @users_api_blueprint.route('/', methods=['GET'])
@@ -146,19 +146,19 @@ def get_user(user_id: str):
     return user
 
 
-@users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['GET'])
+@users_api_blueprint.route('/<user_id>/role', methods=['GET'])
 # @jwt_required()
 @response(new_role_schema, 200)
 # @log_activity
-def get_user_role(user_id: str, role_id: str):
-    user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).first()
+def get_user_role(user_id: str):
+    user_role = UserRole.query.filter_by(user_id=user_id).first()
     if not user_role:
-        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} and role_id={role_id} not found')
-    role_permissions = RolePermission.query.filter_by(role_id=role_id)
+        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} has no any role')
+    role_permissions = RolePermission.query.filter_by(role_id=user_role.role_id)
     if not role_permissions:
-        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} have no role with any permissions')
+        abort(HTTPStatus.NOT_FOUND, f'role with id={user_role.role_id} have no any permissions')
     permissions_list = [Permission.query.get(role_permission.permission_id) for role_permission in role_permissions]
-    role = Role.query.get(role_id)
+    role = Role.query.get(user_role.role_id)
 
     return dict(name=role.name, permissions=permissions_list)
 
@@ -170,15 +170,19 @@ def get_user_role(user_id: str, role_id: str):
 def set_user_role(user_id: str, role_id: str):
     user = User.query.get(user_id)
     if not user:
-        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
+        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} not found')
 
     role = Role.query.get(role_id)
     if not role:
-        abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
+        abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} not found')
+
+    user_role = UserRole.query.filter_by(user_id=user_id).first()
+    if user_role:
+        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} already has role')
 
     user_role = UserRole.query.filter_by(user_id=user_id, role_id=role_id).first()
-    if not user_role:
-        abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} and role_id={role_id} not found')
+    if user_role:
+        abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} already has role with id={role_id}')
 
     user_role = UserRole(role_id=role_id, user_id=user_id)
     database.session.add(user_role)

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: d19cf358025a
+Revision ID: d4a96274c19b
 Revises: 
-Create Date: 2022-07-16 00:07:53.254683
+Create Date: 2022-07-16 18:39:54.556753
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'd19cf358025a'
+revision = 'd4a96274c19b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,6 +40,7 @@ def upgrade():
     sa.Column('modified', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('password_hashed', sa.String(length=128), nullable=False),
+    sa.Column('disabled', sa.Boolean(), nullable=False),
     sa.Column('auth_token', sa.String(length=64), nullable=True),
     sa.Column('auth_token_expiration', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -52,12 +53,12 @@ def upgrade():
     sa.Column('created', sa.DateTime(), nullable=True),
     sa.Column('role_id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('permission_id', postgresql.UUID(as_uuid=True), nullable=False),
-    sa.Column('enabled', sa.Boolean(), nullable=False),
+    sa.Column('value', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['permission_id'], ['permissions.id'], ),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('enabled'),
-    sa.UniqueConstraint('id')
+    sa.UniqueConstraint('id'),
+    sa.UniqueConstraint('value')
     )
     op.create_index(op.f('ix_role_permission_permission_id'), 'role_permission', ['permission_id'], unique=False)
     op.create_index(op.f('ix_role_permission_role_id'), 'role_permission', ['role_id'], unique=False)

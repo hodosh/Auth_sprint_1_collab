@@ -20,6 +20,7 @@ class UserSchema(ma.Schema):
     """Schema defining the attributes of a user."""
     id = ma.String()
     email = ma.String()
+    disabled = ma.Boolean()
 
 
 class UserRole(ma.Schema):

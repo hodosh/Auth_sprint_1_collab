@@ -95,7 +95,7 @@ def delete_role(role_id: str):
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
 
-    role.delete()
+    database.session.delete(role)
     database.session.commit()
 
     return role
