@@ -8,10 +8,10 @@ from project.core.config import ACCESS_EXPIRES
 from project.extensions import jwt_redis_blocklist
 from project.models.models import User
 from project.schemas import token_schema, message_schema, login_schema
-from . import session_api_blueprint
+from . import auth_api_blueprint
 
 
-@session_api_blueprint.route('/login', methods=['POST'])
+@auth_api_blueprint.route('/login', methods=['POST'])
 @body(login_schema)
 @response(token_schema)
 def login(kwargs):
@@ -29,7 +29,8 @@ def login(kwargs):
     return dict(token=access_token)
 
 
-@session_api_blueprint.route('/logout', methods=['DELETE'])
+@auth_api_blueprint.route('/logout', methods=['DELETE'])
+@jwt_required()
 @response(message_schema)
 def logout():
     jti = get_jwt()['jti']
@@ -45,12 +46,12 @@ def logout():
 #     """Get authentication token"""
 #     user = basic_auth.current_user()
 #     token = user.generate_auth_token()
-#     database.session.add(user)
-#     database.session.commit()
+#     database.auth.add(user)
+#     database.auth.commit()
 #     return dict(token=token)
 
 
-@session_api_blueprint.route('/refresh', methods=['POST'])
+@auth_api_blueprint.route('/refresh', methods=['POST'])
 # @jwt_required()
 @response(token_schema, 200)
 async def refresh_token_user():
