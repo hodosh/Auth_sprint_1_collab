@@ -1,5 +1,5 @@
-from http import HTTPStatus
 import typing as t
+from http import HTTPStatus
 
 import redis
 from flask import abort
@@ -50,8 +50,10 @@ def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
                 abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
             permission_list = [permission] if not isinstance(permission, list) else permission
-            for permission_single in permission_list:
-                _check_permission(role_id, permission_single)
+
+            access = any([_check_permission(role_id, permission_single) for permission_single in permission_list])
+            if not access:
+                abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
             return func(*args, **kwargs)
 
@@ -60,12 +62,13 @@ def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
     return decorator
 
 
-def _check_permission(role_id, permission):
+def _check_permission(role_id, permission) -> bool:
     permission_obj = Permission.query.filter_by(name=permission.value).first()
     if not permission_obj:
-        abort(HTTPStatus.NOT_FOUND, f'permission {permission.value} not found')
+        return False
+
     role_permission = RolePermission.query.filter_by(role_id=role_id, permission_id=permission_obj.id).first()
     if not role_permission:
-        abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} have no permission with id={permission_obj.id}')
-    if role_permission.value.lower() != 'true':
-        abort(HTTPStatus.FORBIDDEN, f'role with id={role_id} has no access for action')
+        return False
+
+    return role_permission.value.lower() == 'true'

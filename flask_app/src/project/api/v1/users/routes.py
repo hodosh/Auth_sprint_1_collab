@@ -9,7 +9,7 @@ from apifairy import (
 from flask import abort
 
 from project import database, basic_auth
-from project.core.permissions import USER_SELF
+from project.core.permissions import USER_SELF, USER_ALL
 from project.extensions import check_access
 from project.models.models import (
     User,
@@ -106,9 +106,10 @@ def update_user(kwargs, user_id: str):
 
 @users_api_blueprint.route('/<user_id>', methods=['DELETE'])
 # @jwt_required()
+@authenticate(basic_auth)
+@check_access(USER_ALL.DELETE)
 @response(user_schema, 200)
 def disable_user(user_id: str):
-    # todo удалять может только суперюзер, тут надо сделать проверку прав
     user = User.query.get(user_id)
     if not user.is_enabled():
         abort(HTTPStatus.EXPECTATION_FAILED, f'user with user_id={user_id} is already disabled')
@@ -122,6 +123,8 @@ def disable_user(user_id: str):
 
 @users_api_blueprint.route('/', methods=['GET'])
 # @jwt_required()
+@authenticate(basic_auth)
+@check_access(USER_ALL.READ)
 @response(UserSchema(many=True), 200)
 def get_all_users():
     users = User.query.order_by(User.email).all()
@@ -133,6 +136,8 @@ def get_all_users():
 
 @users_api_blueprint.route('/<user_id>', methods=['GET'])
 # @jwt_required()
+@authenticate(basic_auth)
+@check_access(USER_SELF.READ)
 @response(user_schema, 200)
 def get_user(user_id: str):
     user = User.query.get(user_id)
@@ -144,6 +149,8 @@ def get_user(user_id: str):
 
 @users_api_blueprint.route('/<user_id>/role', methods=['GET'])
 # @jwt_required()
+@authenticate(basic_auth)
+@check_access([USER_SELF.READ, USER_ALL.READ])
 @response(new_role_schema, 200)
 def get_user_role(user_id: str):
     user = User.query.get(user_id).first()
@@ -166,6 +173,8 @@ def get_user_role(user_id: str):
 
 @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['PUT'])
 # @jwt_required()
+@authenticate(basic_auth)
+@check_access([USER_SELF.UPDATE, USER_ALL.UPDATE])
 @response(user_role_schema, 200)
 def set_user_role(user_id: str, role_id: str):
     user = User.query.get(user_id)
@@ -188,6 +197,8 @@ def set_user_role(user_id: str, role_id: str):
 
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 # @jwt_required()
+@authenticate(basic_auth)
+@check_access([USER_SELF.READ, USER_ALL.READ])
 @response(history_schema, 200)
 async def get_user_session_history(user_id: str):
     user_history = UserHistory.query.get(user_id)
