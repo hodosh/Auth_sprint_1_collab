@@ -176,7 +176,7 @@ class UserHistory(IDMixin, CreatedMixin, database.Model):
                               index=True)
 
     activity = database.Column(database.String,
-                               unique=True,
+                               unique=False,
                                nullable=False)
 
     def __init__(self, user_id: str, activity: str):
