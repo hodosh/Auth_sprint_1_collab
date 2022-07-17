@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import typing as t
 
 import redis
 from flask import abort
@@ -40,7 +41,7 @@ def log_activity(func):
     return wrapper
 
 
-def check_access(permission_name: str):
+def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
     def decorator(func):
         def wrapper(*args, **kwargs):
             user: User = token_auth.current_user()
@@ -48,20 +49,23 @@ def check_access(permission_name: str):
             if not role_id:
                 abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
-            permission = Permission.query.filter_by(name=permission_name).first()
-            if not permission:
-                abort(HTTPStatus.NOT_FOUND, f'permission with name={permission_name} not found')
-
-            role_permission = RolePermission.query.filter_by(role_id=role_id, permission_id=permission.id).first()
-
-            if not role_permission:
-                abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} have no permission with id={permission.id}')
-
-            if role_permission.value.lower() != 'true':
-                abort(HTTPStatus.FORBIDDEN, f'role with id={role_id} has no access for action')
+            permission_list = [permission] if not isinstance(permission, list) else permission
+            for permission_single in permission_list:
+                _check_permission(role_id, permission_single)
 
             return func(*args, **kwargs)
 
         return wrapper
 
     return decorator
+
+
+def _check_permission(role_id, permission):
+    permission_obj = Permission.query.filter_by(name=permission.value).first()
+    if not permission_obj:
+        abort(HTTPStatus.NOT_FOUND, f'permission {permission.value} not found')
+    role_permission = RolePermission.query.filter_by(role_id=role_id, permission_id=permission_obj.id).first()
+    if not role_permission:
+        abort(HTTPStatus.NOT_FOUND, f'role with id={role_id} have no permission with id={permission_obj.id}')
+    if role_permission.value.lower() != 'true':
+        abort(HTTPStatus.FORBIDDEN, f'role with id={role_id} has no access for action')
