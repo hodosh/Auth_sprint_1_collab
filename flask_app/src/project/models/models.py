@@ -128,6 +128,10 @@ class Permission(IDMixin, database.Model):
                            unique=True,
                            nullable=False)
 
+    def __init__(self, name: str):
+        """Create a new Permission object."""
+        self.name = name
+
     def __repr__(self):
         return f'<Permission {self.name}>'
 
