@@ -29,6 +29,9 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
 
 
 def log_activity(func):
+    """
+    Декоратор для записи активности пользователя в БД.
+    """
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         user: User = token_auth.current_user()
@@ -42,6 +45,10 @@ def log_activity(func):
 
 
 def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
+    """
+    Декоратор для проверки уровня доступа текущего пользователя.
+    :param permission: объект пермишена
+    """
     def decorator(func):
         def wrapper(*args, **kwargs):
             user: User = token_auth.current_user()
@@ -51,7 +58,7 @@ def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
 
             permission_list = [permission] if not isinstance(permission, list) else permission
 
-            access = any([_check_permission(role_id, permission_single) for permission_single in permission_list])
+            access = any([_check_permission(role_id, p) for p in permission_list])
             if not access:
                 abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
