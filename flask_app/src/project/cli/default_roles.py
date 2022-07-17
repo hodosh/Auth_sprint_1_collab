@@ -1,14 +1,14 @@
+from project import database
+from project.core.permissions import DEFAULT_PERMISSIONS
 from project.core.roles import DEFAULT_ROLES
-from project.core.permissions import USER_SELF, USER_ALL, ROLE_SELF, ROLE_ALL, PERMISSION, DEFAULT_PERMISSIONS
-from project.models.models import User, Role, Permission, RolePermission
-
-from project import database, ma, token_auth
+from project.models.models import Role, Permission, RolePermission
 
 
 def create_default():
     create_permissions()
     create_empty_roles()
     fill_roles()
+
 
 def create_permissions():
     for key, value in DEFAULT_PERMISSIONS.items():
@@ -41,10 +41,7 @@ def fill_roles():
                 assoc = RolePermission(role_id=role.id, permission_id=permission.id, value=permission_value)
                 print(assoc)
                 database.session.add(assoc)
-                # database.session.commit()
             except Exception:
                 pass
 
     database.session.commit()
-
-
