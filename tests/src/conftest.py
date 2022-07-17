@@ -1,9 +1,6 @@
 import pytest
 
 from app import create_app
-import pytest
-
-from app import create_app
 
 
 @pytest.fixture(scope='module')

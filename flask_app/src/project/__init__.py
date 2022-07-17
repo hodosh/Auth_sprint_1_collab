@@ -1,15 +1,22 @@
+from datetime import datetime, timezone, timedelta
+
 from apifairy import APIFairy
 from flask import Flask, json
-import click
 from flask.cli import AppGroup
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
+from flask_jwt_extended import (
+    JWTManager,
+    get_jwt,
+    create_access_token,
+    get_jwt_identity,
+    set_access_cookies,
+)
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 
 from project.core import config
-
 
 # -------------
 # Configuration
@@ -18,12 +25,15 @@ from project.core import config
 # Create the instances of the Flask extensions in the global scope,
 # but without any arguments passed in. These instances are not
 # attached to the Flask application at this point.
+
+
 apifairy = APIFairy()
 ma = Marshmallow()
 database = SQLAlchemy()
 migrate = Migrate()
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
+jwt = JWTManager()
 
 
 # ------------
@@ -69,6 +79,24 @@ def initialize_extensions(app):
     ma.init_app(app)
     database.init_app(app)
 
+    app.config["JWT_SECRET_KEY"] = "eyJhbGciOiJSUzI1NiIsImNsYXNzaWQiOjQ5Nn0"  # Change this!
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.ACCESS_EXPIRES
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = config.REFRESH_EXPIRES
+    jwt.init_app(app=app)
+
+    @app.after_request
+    def refresh_expiring_jwts(response):
+        try:
+            exp_timestamp = get_jwt()["exp"]
+            now = datetime.now(timezone.utc)
+            target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+            if target_timestamp > exp_timestamp:
+                access_token = create_access_token(identity=get_jwt_identity())
+                set_access_cookies(response, access_token)
+            return response
+        except (RuntimeError, KeyError):
+            return response
+
     import project.models
     migrate.init_app(app, database)
 
@@ -77,9 +105,11 @@ def register_blueprints(app):
     # Import the blueprints
     from project.api.v1.role import role_api_blueprint
     from project.api.v1.users import users_api_blueprint
+    from project.api.v1.auth import auth_api_blueprint
 
     # Since the application instance is now created, register each Blueprint
     # with the Flask application instance (app)
+    app.register_blueprint(auth_api_blueprint, url_prefix='/api/v1/auth')
     app.register_blueprint(users_api_blueprint, url_prefix='/api/v1/users')
     app.register_blueprint(role_api_blueprint, url_prefix='/api/v1/roles')
 
