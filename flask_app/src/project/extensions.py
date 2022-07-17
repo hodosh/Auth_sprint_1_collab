@@ -26,24 +26,10 @@ def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
     return token_in_redis is not None
 
 
-def log_activity(func):
-    """
-    Декоратор для записи активности пользователя в БД.
-    """
-
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        email = get_jwt()['sub']
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            abort(HTTPStatus.NOT_FOUND, f'user with email={email} not found')
-        user_history = UserHistory(user_id=user.id, activity=func.__name__)
-
-        database.session.add(user_history)
-        database.session.commit()
-        return result
-
-    return wrapper
+def log_activity(user_id: str, activity: str):
+    user_history = UserHistory(user_id=user_id, activity=activity)
+    database.session.add(user_history)
+    database.session.commit()
 
 
 def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
