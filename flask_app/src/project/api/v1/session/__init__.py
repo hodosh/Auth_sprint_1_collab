@@ -1,7 +1,6 @@
 """
-The 'journal_api' blueprint handles the API for managing journal entries.
-Specifically, this blueprint allows for journal entries to be added, edited,
-and deleted.
+The 'session_api' blueprint handles the API for managing session.
+Specifically, this blueprint allows login, logout and refresh token operations.
 """
 from flask import Blueprint
 

@@ -7,8 +7,9 @@ from apifairy import (
     other_responses,
 )
 from flask import abort
+from flask_jwt_extended import jwt_required
 
-from project import database, basic_auth
+from project import database
 from project.core.permissions import USER_SELF, USER_ALL
 from project.extensions import check_access
 from project.models.models import (
@@ -31,17 +32,17 @@ from project.schemas import (
 from . import users_api_blueprint
 
 
-@users_api_blueprint.route('/get-auth-token', methods=['POST'])
-@authenticate(basic_auth)
-@response(token_schema)
-@other_responses({401: 'Invalid username or password'})
-def get_auth_token():
-    """Get authentication token"""
-    user = basic_auth.current_user()
-    token = user.generate_auth_token()
-    database.session.add(user)
-    database.session.commit()
-    return dict(token=token)
+# @users_api_blueprint.route('/get-auth-token', methods=['POST'])
+# @authenticate(basic_auth)
+# @response(token_schema)
+# @other_responses({401: 'Invalid username or password'})
+# def get_auth_token():
+#     """Get authentication token"""
+#     user = basic_auth.current_user()
+#     token = user.generate_auth_token()
+#     database.session.add(user)
+#     database.session.commit()
+#     return dict(token=token)
 
 
 @users_api_blueprint.route('/register', methods=['POST'])
@@ -72,8 +73,8 @@ def register(kwargs):
 
 
 @users_api_blueprint.route('/<user_id>', methods=['POST'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
+# @authenticate(basic_auth)
 @check_access(USER_SELF.UPDATE)
 @body(update_user_schema)
 @response(user_schema, 201)
@@ -105,8 +106,8 @@ def update_user(kwargs, user_id: str):
 
 
 @users_api_blueprint.route('/<user_id>', methods=['DELETE'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
+# @authenticate(basic_auth)
 @check_access(USER_ALL.DELETE)
 @response(user_schema, 200)
 def disable_user(user_id: str):
@@ -122,8 +123,8 @@ def disable_user(user_id: str):
 
 
 @users_api_blueprint.route('/', methods=['GET'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
+# @authenticate(basic_auth)
 @check_access(USER_ALL.READ)
 @response(UserSchema(many=True), 200)
 def get_all_users():
@@ -135,8 +136,8 @@ def get_all_users():
 
 
 @users_api_blueprint.route('/<user_id>', methods=['GET'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
+# @authenticate(basic_auth)
 @check_access(USER_SELF.READ)
 @response(user_schema, 200)
 def get_user(user_id: str):
@@ -149,7 +150,7 @@ def get_user(user_id: str):
 
 @users_api_blueprint.route('/<user_id>/role', methods=['GET'])
 # @jwt_required()
-@authenticate(basic_auth)
+# @authenticate(basic_auth)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 @response(new_role_schema, 200)
 def get_user_role(user_id: str):
@@ -173,7 +174,7 @@ def get_user_role(user_id: str):
 
 @users_api_blueprint.route('/<user_id>/role/<role_id>', methods=['PUT'])
 # @jwt_required()
-@authenticate(basic_auth)
+# @authenticate(basic_auth)
 @check_access([USER_SELF.UPDATE, USER_ALL.UPDATE])
 @response(user_role_schema, 200)
 def set_user_role(user_id: str, role_id: str):
@@ -197,7 +198,7 @@ def set_user_role(user_id: str, role_id: str):
 
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 # @jwt_required()
-@authenticate(basic_auth)
+# # @authenticate(basic_auth)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 @response(history_schema, 200)
 def get_user_session_history(user_id: str):
