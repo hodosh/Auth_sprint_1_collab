@@ -9,6 +9,8 @@ from apifairy import (
 from flask import abort
 
 from project import database, basic_auth
+from project.core.permissions import USER_SELF
+from project.extensions import check_access
 from project.models.models import (
     User,
     Role,
@@ -71,11 +73,11 @@ def register(kwargs):
 
 @users_api_blueprint.route('/<user_id>', methods=['POST'])
 # @jwt_required()
+@authenticate(basic_auth)
 @body(update_user_schema)
+@check_access(USER_SELF.UPDATE)
 @response(user_schema, 201)
 def update_user(kwargs, user_id: str):
-    # todo обновлять может только суперюзер, тут надо сделать проверку прав
-    # update self
     email = kwargs['email']
     old_password = kwargs['old_password']
     new_password = kwargs['new_password']
