@@ -4,6 +4,10 @@ from rich.pretty import pprint
 
 from project.validators.password import PasswordValidator
 from project.validators.email import EmailValidator
+from project.core.roles import ROLE_SUPERUSER
+from project.models.models import User, Role
+
+from project import database
 
 
 def create_superuser() -> bool:
@@ -19,7 +23,10 @@ def create_superuser() -> bool:
         pprint("Password dont match")
         return False
 
-    #     --------------- TODO: CREATE NEW USER HERE ---------------
+    role_superuser = database.session.query(Role).filter(Role.name == ROLE_SUPERUSER).first()
+    new_user = User(email=email, password_plaintext=password1, role_id=role_superuser.id)
+    database.session.add(new_user)
+    database.session.commit()
 
-    pprint("new user created")
+    pprint("New user created")
     return True

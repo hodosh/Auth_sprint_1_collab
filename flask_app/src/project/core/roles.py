@@ -93,8 +93,18 @@ NON_REGISTERED = {
     PERMISSION.DELETE: False
 }
 
+# Название ролей в базе данных
+ROLE_SUPERUSER = "superuser"
+ROLE_USER = "user"
+ROLE_NON_REGISTERED = "non_registered"
+
+#  При новой регистрации будет использована роль
+USER_DEFAULT_ROLE = ROLE_USER
+
+#
 DEFAULT_ROLES = {
-    "superuser": SUPERUSER_ROLE,
-    "user": USER_ROLE,
-    "non_registered": NON_REGISTERED
+    ROLE_SUPERUSER: SUPERUSER_ROLE,
+    ROLE_USER: USER_ROLE,
+    ROLE_NON_REGISTERED: NON_REGISTERED
 }
+
