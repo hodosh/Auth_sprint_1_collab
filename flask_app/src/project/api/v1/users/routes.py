@@ -74,8 +74,8 @@ def register(kwargs):
 @users_api_blueprint.route('/<user_id>', methods=['POST'])
 # @jwt_required()
 @authenticate(basic_auth)
-@body(update_user_schema)
 @check_access(USER_SELF.UPDATE)
+@body(update_user_schema)
 @response(user_schema, 201)
 def update_user(kwargs, user_id: str):
     email = kwargs['email']
@@ -200,7 +200,7 @@ def set_user_role(user_id: str, role_id: str):
 @authenticate(basic_auth)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 @response(history_schema, 200)
-async def get_user_session_history(user_id: str):
+def get_user_session_history(user_id: str):
     user_history = UserHistory.query.get(user_id)
     if not user_history:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
