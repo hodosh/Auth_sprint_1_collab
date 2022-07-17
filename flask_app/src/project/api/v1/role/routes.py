@@ -1,9 +1,10 @@
 from http import HTTPStatus
 
-from apifairy import response, body, authenticate
+from apifairy import response, body
 from flask import abort
+from flask_jwt_extended import jwt_required
 
-from project import database, basic_auth
+from project import database
 from project.core.permissions import ROLE_SELF, ROLE_ALL
 from project.extensions import check_access
 from project.models.models import Role, RolePermission
@@ -13,8 +14,7 @@ from . import role_api_blueprint
 
 
 @role_api_blueprint.route('/create', methods=['POST'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
 @check_access([ROLE_SELF.CREATE, ROLE_ALL.CREATE])
 @body(new_role_schema)
 @response(role_schema, 200)
@@ -37,8 +37,7 @@ def create_role(kwargs: dict):
 
 
 @role_api_blueprint.route('/<role_id>', methods=['POST'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
 @check_access([ROLE_SELF.UPDATE, ROLE_ALL.UPDATE])
 @body(new_role_schema)
 @response(role_schema, 200)
@@ -60,8 +59,7 @@ def update_role(kwargs: dict, role_id: str):
 
 
 @role_api_blueprint.route('/', methods=['GET'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
 @check_access([ROLE_SELF.READ, ROLE_ALL.READ])
 @response(ShortRoleSchema(many=True), 200)
 def get_all_roles():
@@ -73,8 +71,7 @@ def get_all_roles():
 
 
 @role_api_blueprint.route('/<role_id>', methods=['GET'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
 @check_access([ROLE_SELF.READ, ROLE_ALL.READ])
 @response(role_schema, 200)
 def get_role(role_id: str):
@@ -86,8 +83,7 @@ def get_role(role_id: str):
 
 
 @role_api_blueprint.route('/<role_id>', methods=['DELETE'])
-# @jwt_required()
-@authenticate(basic_auth)
+@jwt_required()
 @check_access([ROLE_SELF.DELETE, ROLE_ALL.DELETE])
 @body(new_role_schema)
 @response(role_schema, 200)
