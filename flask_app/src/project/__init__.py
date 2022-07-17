@@ -1,6 +1,5 @@
 from apifairy import APIFairy
 from flask import Flask, json
-import click
 from flask.cli import AppGroup
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_marshmallow import Marshmallow
