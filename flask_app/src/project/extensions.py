@@ -63,7 +63,8 @@ def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
                 abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
             return func(*args, **kwargs)
-
+        # Renaming the function name:
+        wrapper.__name__ = func.__name__
         return wrapper
 
     return decorator
