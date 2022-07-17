@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 import redis
 from flask import abort
-from flask_jwt_extended import current_user
+from flask_jwt_extended import get_jwt
 
 from project import database, jwt
 from project.core import config
@@ -11,6 +11,7 @@ from project.models.models import (
     UserHistory,
     RolePermission,
     Permission,
+    User,
 )
 
 jwt_redis_blocklist = redis.StrictRedis(
@@ -32,7 +33,11 @@ def log_activity(func):
 
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
-        user_history = UserHistory(user_id=current_user.id, activity=func.__name__)
+        email = get_jwt()['sub']
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            abort(HTTPStatus.NOT_FOUND, f'user with email={email} not found')
+        user_history = UserHistory(user_id=user.id, activity=func.__name__)
 
         database.session.add(user_history)
         database.session.commit()
@@ -49,15 +54,19 @@ def check_access(permission: t.Union[t.Any, t.List[t.Any]]):
 
     def decorator(func):
         def wrapper(*args, **kwargs):
-            role_id = current_user.role_id
+            email = get_jwt()['sub']
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                abort(HTTPStatus.NOT_FOUND, f'user with email={email} not found')
+            role_id = user.role_id
             if not role_id:
-                abort(HTTPStatus.FORBIDDEN, f'user with id={current_user.id} has no access for action')
+                abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
             permission_list = [permission] if not isinstance(permission, list) else permission
 
             access = any([_check_permission(role_id, p) for p in permission_list])
             if not access:
-                abort(HTTPStatus.FORBIDDEN, f'user with id={current_user.id} has no access for action')
+                abort(HTTPStatus.FORBIDDEN, f'user with id={user.id} has no access for action')
 
             return func(*args, **kwargs)
 
