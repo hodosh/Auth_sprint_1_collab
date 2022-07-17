@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
 from apifairy import response, body
-from flask import abort, request
-from flask_jwt_extended import create_access_token, get_jwt, jwt_required, current_user
+from flask import abort
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 
 from project.core.config import ACCESS_EXPIRES
 from project.extensions import jwt_redis_blocklist
@@ -36,23 +36,3 @@ def logout():
     jti = get_jwt()['jti']
     jwt_redis_blocklist.set(jti, '', ex=ACCESS_EXPIRES)
     return dict(message='Access token revoked')
-
-
-# @session_api_blueprint.route('/get-auth-token', methods=['POST'])
-# @authenticate(basic_auth)
-# @response(token_schema)
-# @other_responses({401: 'Invalid username or password'})
-# def get_auth_token():
-#     """Get authentication token"""
-#     user = basic_auth.current_user()
-#     token = user.generate_auth_token()
-#     database.auth.add(user)
-#     database.auth.commit()
-#     return dict(token=token)
-
-
-@auth_api_blueprint.route('/refresh', methods=['POST'])
-# @jwt_required()
-@response(token_schema, 200)
-async def refresh_token_user():
-    pass

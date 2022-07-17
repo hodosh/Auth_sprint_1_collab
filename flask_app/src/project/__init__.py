@@ -1,8 +1,16 @@
+from datetime import datetime, timezone, timedelta
+
 from apifairy import APIFairy
 from flask import Flask, json
 from flask.cli import AppGroup
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import (
+    JWTManager,
+    get_jwt,
+    create_access_token,
+    get_jwt_identity,
+    set_access_cookies,
+)
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -75,6 +83,19 @@ def initialize_extensions(app):
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.ACCESS_EXPIRES
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = config.REFRESH_EXPIRES
     jwt.init_app(app=app)
+
+    @app.after_request
+    def refresh_expiring_jwts(response):
+        try:
+            exp_timestamp = get_jwt()["exp"]
+            now = datetime.now(timezone.utc)
+            target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
+            if target_timestamp > exp_timestamp:
+                access_token = create_access_token(identity=get_jwt_identity())
+                set_access_cookies(response, access_token)
+            return response
+        except (RuntimeError, KeyError):
+            return response
 
     import project.models
     migrate.init_app(app, database)

@@ -9,7 +9,6 @@ from project import database, jwt
 from project.core import config
 from project.models.models import (
     UserHistory,
-    User,
     RolePermission,
     Permission,
 )
