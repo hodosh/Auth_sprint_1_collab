@@ -7,6 +7,7 @@ from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from project import database
+from project.core.roles import USER_DEFAULT_ROLE
 
 
 # ----------------
@@ -57,15 +58,21 @@ class User(IDMixin, CreatedModifiedMixin, database.Model):
     role_id = database.Column(UUID(as_uuid=True),
                               database.ForeignKey('roles.id'))
 
-    entries = database.relationship('Entry',
-                                    backref='user',
-                                    lazy='dynamic')
+    # entries = database.relationship('Entry',
+    #                                 backref='user',
+    #                                 lazy='dynamic')
 
-    def __init__(self, email: str, password_plaintext: str, disabled: bool = False):
+    def __init__(self, email: str, password_plaintext: str, disabled: bool = False, role_id: str = USER_DEFAULT_ROLE):
         """Create a new User object."""
         self.email = email
         self.password_hashed = self._generate_password_hash(password_plaintext)
         self.disabled = disabled
+
+        if role_id == USER_DEFAULT_ROLE:
+            role_superuser = database.session.query(Role).filter(Role.name == USER_DEFAULT_ROLE).first()
+            self.role_id = role_superuser.id
+        else:
+            self.role_id = role_id
 
     def is_password_correct(self, password_plaintext: str):
         return check_password_hash(self.password_hashed, password_plaintext)
