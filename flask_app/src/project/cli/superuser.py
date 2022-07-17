@@ -4,11 +4,10 @@ from rich.pretty import pprint
 
 from project.validators.password import PasswordValidator
 from project.validators.email import EmailValidator
-from project.core.roles import DEFAULT_ROLES, ROLE_SUPERUSER
-from project.core.permissions import USER_SELF, USER_ALL, ROLE_SELF, ROLE_ALL, PERMISSION, DEFAULT_PERMISSIONS
-from project.models.models import User, Role, Permission, RolePermission
+from project.core.roles import ROLE_SUPERUSER
+from project.models.models import User, Role
 
-from project import database, ma, token_auth
+from project import database
 
 
 def create_superuser() -> bool:
