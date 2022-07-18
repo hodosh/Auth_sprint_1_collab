@@ -9,7 +9,7 @@ services:
       - ./flask_app/src:/usr/src/app
     env_file:
       - flask_app/src/project/core/.env
-    command: python app.py
+    command: python pywsgi.py
     ports:
       - "5000:5000"
     networks:
