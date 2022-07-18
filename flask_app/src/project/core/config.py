@@ -27,6 +27,6 @@ REDIS_DB = os.getenv('REDIS_DB', 0)
 
 SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 
-ACCESS_EXPIRES = timedelta(hours=int(os.getenv('ACCESS_EXPIRES_IN_HOURS')))
-REFRESH_EXPIRES = timedelta(days=int(os.getenv('REFRESH_EXPIRES_IN_DAYS')))
-SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+ACCESS_EXPIRES = timedelta(hours=int(os.getenv('ACCESS_EXPIRES_IN_HOURS', 1)))
+REFRESH_EXPIRES = timedelta(days=int(os.getenv('REFRESH_EXPIRES_IN_DAYS', 1)))
+SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'secret_key')
