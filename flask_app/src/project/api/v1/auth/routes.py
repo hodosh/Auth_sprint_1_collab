@@ -17,7 +17,7 @@ from . import auth_api_blueprint
 def login(kwargs):
     email = kwargs['email']
     password = kwargs['password']
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email, disabled=False).first()
 
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with email={email} not found')
