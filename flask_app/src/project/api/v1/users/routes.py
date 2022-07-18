@@ -100,7 +100,6 @@ def disable_user(user_id: str):
     user.disable()
     database.session.commit()
 
-    # todo удалить сессию и токены
     return user
 
 

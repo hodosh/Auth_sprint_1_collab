@@ -79,7 +79,7 @@ def initialize_extensions(app):
     ma.init_app(app)
     database.init_app(app)
 
-    app.config["JWT_SECRET_KEY"] = "eyJhbGciOiJSUzI1NiIsImNsYXNzaWQiOjQ5Nn0"  # Change this!
+    app.config["JWT_SECRET_KEY"] = config.SECRET_KEY  # Change this!
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.ACCESS_EXPIRES
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = config.REFRESH_EXPIRES
     jwt.init_app(app=app)
