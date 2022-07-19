@@ -17,20 +17,13 @@ services:
     depends_on:
       database:
         condition: service_healthy
-#    entrypoint: >
-#      sh -c "flask db init
-#      && flask db migrate
-#      && flask db upgrade
-#      && flask create roles
-#
-#      "
 
   database:
     image: postgres:13-alpine3.16
     restart: always
     container_name: postgres
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     env_file:
       - database/.env
     volumes:
@@ -55,6 +48,11 @@ services:
       - cache:/data
     networks:
       - api
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
 
 volumes:
   cache:
