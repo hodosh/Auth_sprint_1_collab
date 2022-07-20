@@ -14,6 +14,9 @@ class TestSettings(BaseSettings):
     db_user: str = Field('app', env='DB_USER')
     db_pass: str = Field('123qwe', env='DB_PASS')
 
+    jwt_secret_key: str = Field('should match the flask_api value!!!', env='JWT_SECRET_KEY')
+    jwt_algorithms: str = Field('HS256', env='JWT_ALGORITHMS')
+
     def get_api_url(self):
         return f'{self.api_host}/{self.api_port}'.rstrip('/')
 

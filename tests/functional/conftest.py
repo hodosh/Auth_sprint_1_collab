@@ -4,6 +4,7 @@ import typing as t
 from dataclasses import dataclass
 
 import aiohttp
+import aioredis
 import psycopg2
 import pytest
 from multidict import CIMultiDictProxy
@@ -92,17 +93,19 @@ def make_post_request():
     return inner
 
 
-@pytest.fixture
-def make_delete_request(session):
-    async def inner(method: str, params: t.Optional[dict] = None) -> HTTPResponse:
-        params = params or {}
+@pytest.fixture(scope='function')
+def make_delete_request():
+    async def inner(method: str, data: t.Optional[dict] = None, headers: dict = {}) -> HTTPResponse:
+        headers = {'Content-Type': 'application/json', **headers}
+        data = data or {}
         url = f'{settings.api_host.rstrip("/")}:{settings.api_port}/api/v1{method}'
-        async with session.delete(url, params=params) as response:
-            return HTTPResponse(
-                body=await response.json(),
-                headers=response.headers,
-                status=response.status,
-            )
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.delete(url, data=json.dumps(data)) as response:
+                return HTTPResponse(
+                    body=await response.json(),
+                    headers=response.headers,
+                    status=response.status,
+                )
 
     return inner
 
@@ -144,10 +147,34 @@ def db_cursor(db_connection):
     cursor.close()
 
 
+@pytest.fixture(scope='function')
+async def actual_token(make_post_request):
+    response = await make_post_request('/auth/login',
+                                       data=login_data)
+    yield response.body['token']
+
+
 @pytest.fixture(scope='session')
-def actual_token(make_post_request):
-    async def inner():
-        response = await make_post_request('/auth/login',
-                                           data=login_data)
-        yield response.body['token']
+async def redis_client():
+    client = await aioredis.create_redis_pool((settings.redis_host, settings.redis_port), minsize=10, maxsize=20)
+    yield client
+    client.close()
+
+
+@pytest.fixture(scope='function')
+def read_from_redis():
+    async def inner(key: t.Union[str, bytes]):
+        redis = await aioredis.create_redis_pool((settings.redis_host, settings.redis_port), minsize=10, maxsize=20)
+
+        return await redis.get(key)
+
+    return inner
+
+
+@pytest.fixture(scope='function')
+def put_to_redis():
+    async def inner(key: t.Union[str, bytes], data: t.Dict[t.AnyStr, t.Any]):
+        redis = await aioredis.create_redis_pool((settings.redis_host, settings.redis_port), minsize=10, maxsize=20)
+        await redis.set(key, json.dumps(data), expire=60)
+
     return inner
