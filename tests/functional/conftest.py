@@ -60,31 +60,31 @@ def make_get_request():
     return inner
 
 
-@pytest.fixture
-def make_put_request(session):
-    async def inner(method: str, params: t.Optional[dict] = None) -> HTTPResponse:
-        params = params or {}
+@pytest.fixture(scope='function')
+def make_post_request():
+    async def inner(method: str, data: t.Optional[dict] = None, headers={}) -> HTTPResponse:
+        headers = {'Content-Type': 'application/json', **headers}
+        data = data or {}
         url = f'{settings.api_host.rstrip("/")}:{settings.api_port}/api/v1{method}'
-        async with session.put(url, params=params) as response:
-            return HTTPResponse(
-                body=await response.json(),
-                headers=response.headers,
-                status=response.status,
-            )
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.post(url, data=json.dumps(data)) as response:
+                return HTTPResponse(
+                    body=await response.json(),
+                    headers=response.headers,
+                    status=response.status,
+                )
 
     return inner
 
 
 @pytest.fixture(scope='function')
-def make_post_request():
-    async def inner(method: str, data: t.Optional[dict] = None, headers: t.Optional[dict] = None) -> HTTPResponse:
-        headers = headers or {}
+def make_put_request():
+    async def inner(method: str, data: t.Optional[dict] = None, headers={}) -> HTTPResponse:
+        headers = {'Content-Type': 'application/json', **headers}
         data = data or {}
-        if data:
-            headers = {'Content-Type': 'application/json'}
         url = f'{settings.api_host.rstrip("/")}:{settings.api_port}/api/v1{method}'
         async with aiohttp.ClientSession(headers=headers) as session:
-            async with session.post(url, data=json.dumps(data)) as response:
+            async with session.put(url, data=json.dumps(data)) as response:
                 return HTTPResponse(
                     body=await response.json(),
                     headers=response.headers,

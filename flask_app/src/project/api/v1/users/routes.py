@@ -23,8 +23,8 @@ from project.schemas import (
     UserSchema,
     update_user_schema,
     new_role_schema,
-    history_schema,
     user_role_schema,
+    HistorySchema,
 )
 from . import users_api_blueprint
 
@@ -180,11 +180,12 @@ def set_user_role(user_id: str, role_id: str):
 
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 @jwt_required()
-@response(history_schema, 200)
+@response(HistorySchema(many=True), 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 def get_user_session_history(user_id: str):
-    user_history = UserHistory.query.get(user_id)
+    user_history: UserHistory = UserHistory.query.filter_by(user_id=user_id).all()
     if not user_history:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
 
     return user_history
+    # return dict(activity=user_history.activity, created=user_history.created)
