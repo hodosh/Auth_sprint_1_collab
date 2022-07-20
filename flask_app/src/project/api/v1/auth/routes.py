@@ -15,6 +15,9 @@ from . import auth_api_blueprint
 @body(login_schema)
 @response(token_schema)
 def login(kwargs):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find email and password in data!')
+
     email = kwargs['email']
     password = kwargs['password']
     user = User.query.filter_by(email=email, disabled=False).first()
@@ -23,7 +26,7 @@ def login(kwargs):
         abort(HTTPStatus.NOT_FOUND, f'user with email={email} not found')
 
     if not user.is_password_correct(password):
-        abort(HTTPStatus.EXPECTATION_FAILED, 'old password is incorrect')
+        abort(HTTPStatus.EXPECTATION_FAILED, 'password is incorrect')
 
     access_token = create_access_token(identity=email)
     log_activity(user.id, 'login')
