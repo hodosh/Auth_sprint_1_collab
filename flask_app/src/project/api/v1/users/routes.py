@@ -137,7 +137,7 @@ def get_user(user_id: str):
 @response(new_role_schema, 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 def get_user_role(user_id: str):
-    user = User.query.get(user_id).first()
+    user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
 
