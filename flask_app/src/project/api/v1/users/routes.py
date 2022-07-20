@@ -34,6 +34,8 @@ from . import users_api_blueprint
 @response(user_schema, 201)
 def register(kwargs):
     """Create a new user"""
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find email, password and password_confirm in data!')
     email = kwargs['email']
     password = kwargs['password']
     password_confirm = kwargs['password_confirm']
@@ -62,6 +64,9 @@ def register(kwargs):
 @response(user_schema, 201)
 @check_access(USER_SELF.UPDATE)
 def update_user(kwargs, user_id: str):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED,
+              'cannot find email, old_password, new_password and password_confirm in data!')
     email = kwargs['email']
     old_password = kwargs['old_password']
     new_password = kwargs['new_password']

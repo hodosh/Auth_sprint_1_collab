@@ -19,6 +19,8 @@ from . import role_api_blueprint
 @response(role_schema, 200)
 @check_access([ROLE_SELF.CREATE, ROLE_ALL.CREATE])
 def create_role(kwargs: dict):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find name and permissions in data!')
     name = kwargs['name']
     permissions = kwargs['permissions']
     role = Role.query.filter_by(name=name).first()
@@ -42,6 +44,8 @@ def create_role(kwargs: dict):
 @response(role_schema, 200)
 @check_access([ROLE_SELF.UPDATE, ROLE_ALL.UPDATE])
 def update_role(kwargs: dict, role_id: str):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find name and permissions in data!')
     name = kwargs['name']
     role = Role.query.get(role_id)
     permission_list = kwargs['permissions']
