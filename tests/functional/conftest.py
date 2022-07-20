@@ -4,10 +4,21 @@ import typing as t
 from dataclasses import dataclass
 
 import aiohttp
+import psycopg2
 import pytest
 from multidict import CIMultiDictProxy
+from psycopg2.extras import DictCursor
 
 from tests.functional.settings import settings
+from tests.functional.testdata.auth_data import login_data
+
+DSL = {
+    'dbname': settings.db_name,
+    'user': settings.db_user,
+    'password': settings.db_pass,
+    'host': settings.db_host,
+    'port': settings.db_port,
+}
 
 
 @dataclass
@@ -22,6 +33,14 @@ def event_loop():
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
+
+@pytest.fixture(scope='session')
+async def session():
+    connector = aiohttp.TCPConnector(force_close=True)
+    session = aiohttp.ClientSession(connector=connector)
+    yield session
+    await session.close()
 
 
 @pytest.fixture
@@ -108,4 +127,27 @@ def data_loader(es_client):
         # wait for data appears
         await asyncio.sleep(0.1)
 
+    return inner
+
+
+@pytest.fixture(scope='session')
+def db_connection():
+    conn = psycopg2.connect(**DSL, cursor_factory=DictCursor)
+    yield conn
+    conn.close()
+
+
+@pytest.fixture(scope='function')
+def db_cursor(db_connection):
+    cursor = db_connection.cursor()
+    yield cursor
+    cursor.close()
+
+
+@pytest.fixture(scope='session')
+def actual_token(make_post_request):
+    async def inner():
+        response = await make_post_request('/auth/login',
+                                           data=login_data)
+        yield response.body['token']
     return inner
