@@ -36,7 +36,7 @@ class TestUsers:
         assert response.body['description'] == 'passwords do not match'
         assert response.headers is not None
 
-    async def test_register_user_match_fail(self, make_post_request):
+    async def test_register_user_exists_fail(self, make_post_request, actual_super_user_token):
         await make_post_request('/users/register',
                                 data=register_base_data)
         response = await make_post_request('/users/register',
@@ -45,3 +45,19 @@ class TestUsers:
         assert response.body['description'] == f'user with email={register_base_data["email"]} exists'
         assert response.headers is not None
 
+    async def test_get_users_fail(self, make_get_request, actual_user_token):
+        response = await make_get_request('/users/', headers={'Authorization': f'Bearer {actual_user_token}'})
+
+        assert response.status == HTTPStatus.FORBIDDEN
+        assert 'user with id=' in response.body['description']
+        assert 'has no access for action' in response.body['description']
+        assert response.headers is not None
+
+    async def test_get_users_success(self, make_get_request, actual_super_user_token):
+        response = await make_get_request('/users/', headers={'Authorization': f'Bearer {actual_super_user_token}'})
+
+        assert response.status == HTTPStatus.OK
+
+        assert isinstance(response.body, list)
+        assert list(response.body.pop().keys()) == ['disabled', 'email', 'id']
+        assert response.headers is not None

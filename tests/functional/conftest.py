@@ -44,17 +44,18 @@ async def session():
     await session.close()
 
 
-@pytest.fixture
-def make_get_request(session):
-    async def inner(method: str, params: t.Optional[dict] = None) -> HTTPResponse:
-        params = params or {}
+@pytest.fixture(scope='function')
+def make_get_request():
+    async def inner(method: str, headers: dict = {}) -> HTTPResponse:
+        headers = {'Content-Type': 'application/json', **headers}
         url = f'{settings.api_host.rstrip("/")}:{settings.api_port}/api/v1{method}'
-        async with session.get(url, params=params) as response:
-            return HTTPResponse(
-                body=await response.json(),
-                headers=response.headers,
-                status=response.status,
-            )
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(url) as response:
+                return HTTPResponse(
+                    body=await response.json(),
+                    headers=response.headers,
+                    status=response.status,
+                )
 
     return inner
 
@@ -106,29 +107,6 @@ def make_delete_request():
                     headers=response.headers,
                     status=response.status,
                 )
-
-    return inner
-
-
-@pytest.fixture(scope='function')
-def data_loader(es_client):
-    async def inner(index_name: str, data: t.Union[t.List[t.Dict], t.Dict]):
-        res_data = ''
-
-        if not isinstance(data, list):
-            data = [data]
-
-        for item in data:
-            entity_id = item['id']
-            load = {'index': {'_index': index_name, '_id': entity_id}}
-            res_data += f'{json.dumps(load)}\n{json.dumps(item)}\n'
-
-        res = await es_client.bulk(res_data)
-
-        if res['errors'] is True:
-            raise RuntimeError(f'Something went wrong: {res}')
-        # wait for data appears
-        await asyncio.sleep(0.1)
 
     return inner
 
