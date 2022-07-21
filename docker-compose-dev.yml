@@ -54,6 +54,20 @@ services:
       timeout: 30s
       retries: 50
 
+  tests:
+    build: tests/functional
+    env_file:
+      - ./tests/functional/.env
+    networks:
+      - api
+    volumes:
+      - ./tests/functional/results:/results
+    depends_on:
+      flask_api:
+        condition: service_started
+    entrypoint: >
+      sh -c "pytest src --html=results/report.html"
+
 volumes:
   cache:
     driver: local
