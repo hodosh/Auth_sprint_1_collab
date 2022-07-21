@@ -19,6 +19,8 @@ from . import role_api_blueprint
 @response(role_schema, 200)
 @check_access([ROLE_SELF.CREATE, ROLE_ALL.CREATE])
 def create_role(kwargs: dict):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find name and permissions in data!')
     name = kwargs['name']
     permissions = kwargs['permissions']
     role = Role.query.filter_by(name=name).first()
@@ -42,6 +44,8 @@ def create_role(kwargs: dict):
 @response(role_schema, 200)
 @check_access([ROLE_SELF.UPDATE, ROLE_ALL.UPDATE])
 def update_role(kwargs: dict, role_id: str):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find name and permissions in data!')
     name = kwargs['name']
     role = Role.query.get(role_id)
     permission_list = kwargs['permissions']
@@ -79,18 +83,24 @@ def get_role(role_id: str):
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
 
-    return role
+    role_permissions = RolePermission.query.filter_by(role_id=role_id).all()
+
+    return dict(id=role.id, name=role.name, created=role.created, permissions=role_permissions)
 
 
 @role_api_blueprint.route('/<role_id>', methods=['DELETE'])
 @jwt_required()
-@body(new_role_schema)
 @response(role_schema, 200)
 @check_access([ROLE_SELF.DELETE, ROLE_ALL.DELETE])
 def delete_role(role_id: str):
     role = Role.query.get(role_id)
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
+
+    role_permissions = RolePermission.query.filter_by(role_id=role_id).all()
+    for role_permission in role_permissions:
+        database.session.delete(role_permission)
+    database.session.commit()
 
     database.session.delete(role)
     database.session.commit()

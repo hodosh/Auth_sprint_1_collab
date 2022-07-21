@@ -2,8 +2,7 @@ from project import ma
 
 
 class HistorySchema(ma.Schema):
-    """Schema defining the attributes of a history."""
-    activity = ma.Dict()
+    activity = ma.String()
     created = ma.DateTime()
 
 

@@ -21,7 +21,6 @@ user_role_schema = UserRole()
 token_schema = TokenSchema()
 
 login_schema = LoginSchema()
-history_schema = HistorySchema()
 
 role_schema = RoleSchema()
 new_role_schema = NewRoleSchema()

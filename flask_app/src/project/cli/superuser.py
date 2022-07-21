@@ -1,4 +1,3 @@
-import rich
 from rich.prompt import Prompt
 from rich.pretty import pprint
 

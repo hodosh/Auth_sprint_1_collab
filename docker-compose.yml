@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 
 services:
   flask_api:
@@ -9,14 +9,14 @@ services:
       - ./flask_app/src:/usr/src/app
     env_file:
       - src/core/.env
-    command: gunicorn src.app:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --reload
+    command: python pywsgi.py
     expose:
-      - "8000"
+      - "5000"
     networks:
       - api
     depends_on:
-      - database
-      - redis
+      database:
+        condition: service_healthy
 
   database:
     image: postgres:13-alpine3.16
@@ -31,6 +31,11 @@ services:
       - ./database/data:/var/lib/postgresql/data/
     networks:
       - api
+    healthcheck:
+      test: [ "CMD-SHELL", "su postgres", "&&", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:6.2.6
@@ -44,6 +49,12 @@ services:
       - cache:/data
     networks:
       - api
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+
 
   nginx:
     image: nginx:1.21.6

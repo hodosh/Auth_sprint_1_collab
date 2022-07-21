@@ -23,8 +23,8 @@ from project.schemas import (
     UserSchema,
     update_user_schema,
     new_role_schema,
-    history_schema,
     user_role_schema,
+    HistorySchema,
 )
 from . import users_api_blueprint
 
@@ -34,6 +34,8 @@ from . import users_api_blueprint
 @response(user_schema, 201)
 def register(kwargs):
     """Create a new user"""
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find email, password and password_confirm in data!')
     email = kwargs['email']
     password = kwargs['password']
     password_confirm = kwargs['password_confirm']
@@ -62,6 +64,9 @@ def register(kwargs):
 @response(user_schema, 201)
 @check_access(USER_SELF.UPDATE)
 def update_user(kwargs, user_id: str):
+    if not kwargs:
+        abort(HTTPStatus.EXPECTATION_FAILED,
+              'cannot find email, old_password, new_password and password_confirm in data!')
     email = kwargs['email']
     old_password = kwargs['old_password']
     new_password = kwargs['new_password']
@@ -132,7 +137,7 @@ def get_user(user_id: str):
 @response(new_role_schema, 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 def get_user_role(user_id: str):
-    user = User.query.get(user_id).first()
+    user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
 
@@ -175,11 +180,12 @@ def set_user_role(user_id: str, role_id: str):
 
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 @jwt_required()
-@response(history_schema, 200)
+@response(HistorySchema(many=True), 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 def get_user_session_history(user_id: str):
-    user_history = UserHistory.query.get(user_id)
+    user_history: UserHistory = UserHistory.query.filter_by(user_id=user_id).all()
     if not user_history:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
 
     return user_history
+    # return dict(activity=user_history.activity, created=user_history.created)

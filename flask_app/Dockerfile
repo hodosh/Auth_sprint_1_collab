@@ -22,3 +22,10 @@ RUN pip install -r requirements.txt
 
 # copy project
 COPY . .
+CMD ls
+
+# copy entrypoint
+COPY ./entrypoint.sh $APP_HOME/entrypoint.sh
+CMD ls
+
+#ENTRYPOINT ["entrypoint.sh"]
