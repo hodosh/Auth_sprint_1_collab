@@ -9,9 +9,9 @@ services:
       - ./flask_app/src:/usr/src/app
     env_file:
       - src/core/.env
-    command: gunicorn src.app:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --reload
+    command: python pywsgi.py
     expose:
-      - "8000"
+      - "5000"
     networks:
       - api
     depends_on:
