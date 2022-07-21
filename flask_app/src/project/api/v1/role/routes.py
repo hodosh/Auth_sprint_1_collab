@@ -88,13 +88,17 @@ def get_role(role_id: str):
 
 @role_api_blueprint.route('/<role_id>', methods=['DELETE'])
 @jwt_required()
-@body(new_role_schema)
 @response(role_schema, 200)
 @check_access([ROLE_SELF.DELETE, ROLE_ALL.DELETE])
 def delete_role(role_id: str):
     role = Role.query.get(role_id)
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
+
+    role_permissions = RolePermission.query.filter_by(role_id=role_id).all()
+    for role_permission in role_permissions:
+        database.session.delete(role_permission)
+    database.session.commit()
 
     database.session.delete(role)
     database.session.commit()
