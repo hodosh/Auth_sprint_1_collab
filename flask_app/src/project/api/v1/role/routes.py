@@ -83,7 +83,9 @@ def get_role(role_id: str):
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
 
-    return role
+    role_permissions = RolePermission.query.filter_by(role_id=role_id).all()
+
+    return dict(id=role.id, name=role.name, created=role.created, permissions=role_permissions)
 
 
 @role_api_blueprint.route('/<role_id>', methods=['DELETE'])
