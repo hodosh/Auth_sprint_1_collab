@@ -69,9 +69,10 @@ class TestRoles:
         response = await make_get_request(f'/roles/{role_id}',
                                           headers={'Authorization': f'Bearer {actual_token}'})
 
-        assert list(response.body.keys()) == ['created', 'id', 'name']
+        assert list(response.body.keys()) == ['created', 'id', 'name', 'permissions']
         assert response.body['name'] == role_name
         assert response.body['id'] == role_id
+        assert isinstance(response.body['permissions'], list)
         assert response.headers is not None
 
     async def test_delete_role(self, make_post_request, make_delete_request, actual_token, db_cursor):
