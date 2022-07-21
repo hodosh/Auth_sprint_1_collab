@@ -58,3 +58,13 @@ class TestAuth:
 
         assert response.status == HTTPStatus.UNAUTHORIZED
         assert response.body['msg'] == 'Missing Authorization Header'
+
+    async def test_bad_token_fail(self, make_delete_request, make_post_request, actual_token):
+        await make_delete_request('/auth/logout',
+                                  headers={'Authorization': f'Bearer {actual_token}'})
+
+        response = await make_delete_request('/auth/logout',
+                                             headers={'Authorization': f'Bearer {actual_token}'})
+
+        assert response.status == HTTPStatus.UNAUTHORIZED
+        assert response.body['msg'] == 'Token has been revoked'
