@@ -11,7 +11,10 @@ from multidict import CIMultiDictProxy
 from psycopg2.extras import DictCursor
 
 from tests.functional.settings import settings
-from tests.functional.testdata.auth_data import login_data
+from tests.functional.testdata.auth_data import (
+    login_data,
+    super_user_role_name,
+)
 
 DSL = {
     'dbname': settings.db_name,
@@ -126,7 +129,18 @@ def db_cursor(db_connection):
 
 
 @pytest.fixture(scope='function')
-async def actual_token(make_post_request):
+async def actual_token(make_post_request, db_cursor, db_connection):
+    await make_post_request('/users/register',
+                            data=login_data)
+    db_cursor.execute(f"SELECT id FROM roles WHERE name='{super_user_role_name}';")
+    role_id = db_cursor.fetchone().pop()
+
+    db_cursor.execute(f"SELECT id FROM users WHERE email='{login_data['email']}';")
+    user_id = db_cursor.fetchone().pop()
+
+    db_cursor.execute(f"UPDATE users SET role_id='{role_id}' WHERE id='{user_id}';")
+    db_connection.commit()
+
     response = await make_post_request('/auth/login',
                                        data=login_data)
     yield response.body['token']

@@ -3,6 +3,8 @@ login_data = {
     "password": "admin"
 }
 
+super_user_role_name = 'superuser'
+
 login_wrong_email_data = {
     "email": 'wrong',
     "password": "admin"
