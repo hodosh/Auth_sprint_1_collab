@@ -12,20 +12,19 @@ from flask_jwt_extended import (
     set_access_cookies,
 )
 from flask_marshmallow import Marshmallow
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
 
 from project.core import config
+# Create the instances of the Flask extensions in the global scope,
+# but without any arguments passed in. These instances are not
+# attached to the Flask application at this point.
+from project.core.config import settings
 
 # -------------
 # Configuration
 # -------------
-
-# Create the instances of the Flask extensions in the global scope,
-# but without any arguments passed in. These instances are not
-# attached to the Flask application at this point.
-
 
 apifairy = APIFairy()
 ma = Marshmallow()
@@ -40,7 +39,7 @@ jwt = JWTManager()
 
 
 def get_api_url():
-    return f"http://{config.FLASK_HOST}:{config.FLASK_PORT}/v1"
+    return f"http://{settings.FLASK_HOST}:{settings.FLASK_PORT}/v1"
 
 
 # ----------------------------
@@ -52,12 +51,12 @@ def create_app():
     app = Flask(__name__)
 
     # Configure the API documentation
-    app.config['APIFAIRY_TITLE'] = config.PROJECT_NAME
+    app.config['APIFAIRY_TITLE'] = settings.PROJECT_NAME
     app.config['APIFAIRY_VERSION'] = '0.1'
     app.config['APIFAIRY_UI'] = 'swagger_ui'
 
     # Configure the PG DB
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     initialize_extensions(app)
@@ -79,9 +78,9 @@ def initialize_extensions(app):
     ma.init_app(app)
     database.init_app(app)
 
-    app.config["JWT_SECRET_KEY"] = config.SECRET_KEY  # Change this!
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = config.ACCESS_EXPIRES
-    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = config.REFRESH_EXPIRES
+    app.config["JWT_SECRET_KEY"] = settings.SECRET_KEY  # Change this!
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = settings.ACCESS_EXPIRES
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = settings.REFRESH_EXPIRES
     jwt.init_app(app=app)
 
     @app.after_request

@@ -5,8 +5,7 @@ import redis
 from flask import abort
 from flask_jwt_extended import get_jwt
 
-from project import database, jwt
-from project.core import config
+from project import database, jwt, settings
 from project.models.models import (
     UserHistory,
     RolePermission,
@@ -15,7 +14,7 @@ from project.models.models import (
 )
 
 jwt_redis_blocklist = redis.StrictRedis(
-    host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, decode_responses=True
+    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, decode_responses=True
 )
 
 

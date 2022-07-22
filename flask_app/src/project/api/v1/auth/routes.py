@@ -4,7 +4,7 @@ from apifairy import response, body
 from flask import abort
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 
-from project.core.config import ACCESS_EXPIRES
+from project.core.config import settings
 from project.extensions import jwt_redis_blocklist, log_activity
 from project.models.models import User
 from project.schemas import token_schema, message_schema, login_schema
@@ -41,7 +41,7 @@ def logout():
     """Logout endpoint"""
     jwt = get_jwt()
     jti = jwt['jti']
-    jwt_redis_blocklist.set(jti, '', ex=ACCESS_EXPIRES)
+    jwt_redis_blocklist.set(jti, '', ex=settings.ACCESS_EXPIRES)
     email = jwt['sub']
     user = User.query.filter_by(email=email).first()
 
