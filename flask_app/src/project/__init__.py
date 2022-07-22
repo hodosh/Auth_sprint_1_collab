@@ -2,7 +2,6 @@ from datetime import datetime, timezone, timedelta
 
 from apifairy import APIFairy
 from flask import Flask, json
-from flask.cli import AppGroup
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_jwt_extended import (
     JWTManager,
@@ -130,17 +129,8 @@ def register_error_handlers(app):
 
 
 def register_cli_command(app):
-    from project.cli.superuser import create_superuser
-    from project.cli.default_roles import create_default
+    from project.cli.superuser import user_cli
+    from project.cli.default_roles import roles_cli
 
-    create_cli = AppGroup('create')
-
-    @create_cli.command('superuser')
-    def create_user():
-        create_superuser()
-
-    @create_cli.command('roles')
-    def create_roles():
-        create_default()
-
-    app.cli.add_command(create_cli)
+    app.cli.add_command(user_cli)
+    app.cli.add_command(roles_cli)
