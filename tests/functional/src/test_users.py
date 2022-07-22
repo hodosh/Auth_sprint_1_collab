@@ -67,7 +67,7 @@ class TestUsers:
         assert response.headers is not None
 
     async def test_get_user_role(self, make_get_request, actual_token, db_cursor):
-        db_cursor.execute("SELECT id, role_id FROM users;")
+        db_cursor.execute(f"SELECT id, role_id FROM users where email='{login_data['email']}';")
         user_id, role_id = db_cursor.fetchone()
         response = await make_get_request(f'/users/{user_id}/role', headers={'Authorization': f'Bearer {actual_token}'})
 
@@ -118,6 +118,6 @@ class TestUsers:
         response = await make_get_request(f'/users/{user_id}/history',
                                           headers={'Authorization': f'Bearer {actual_token}'})
 
-        assert isinstance(response.body, list)
-        assert list(response.body.pop().keys()) == ['activity', 'created']
-
+        assert list(response.body.keys()) == ['history', 'page', 'per_page']
+        assert isinstance(response.body['history'], list)
+        assert list(response.body['history'][0].keys()) == ['activity', 'created']
