@@ -15,6 +15,7 @@ from . import auth_api_blueprint
 @body(login_schema)
 @response(token_schema)
 def login(kwargs):
+    """Login endpoint"""
     if not kwargs:
         abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find email and password in data!')
 
@@ -37,6 +38,7 @@ def login(kwargs):
 @jwt_required()
 @response(message_schema)
 def logout():
+    """Logout endpoint"""
     jwt = get_jwt()
     jti = jwt['jti']
     jwt_redis_blocklist.set(jti, '', ex=ACCESS_EXPIRES)

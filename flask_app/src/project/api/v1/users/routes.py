@@ -64,6 +64,7 @@ def register(kwargs):
 @response(user_schema, 201)
 @check_access(USER_SELF.UPDATE)
 def update_user(kwargs, user_id: str):
+    """Update user info"""
     if not kwargs:
         abort(HTTPStatus.EXPECTATION_FAILED,
               'cannot find email, old_password, new_password and password_confirm in data!')
@@ -98,6 +99,7 @@ def update_user(kwargs, user_id: str):
 @response(user_schema, 200)
 @check_access(USER_ALL.DELETE)
 def disable_user(user_id: str):
+    """Disable user"""
     user = User.query.get(user_id)
     if not user.is_enabled():
         abort(HTTPStatus.EXPECTATION_FAILED, f'user with user_id={user_id} is already disabled')
@@ -113,6 +115,7 @@ def disable_user(user_id: str):
 @response(UserSchema(many=True), 200)
 @check_access(USER_ALL.READ)
 def get_all_users():
+    """Disable user"""
     users = User.query.order_by(User.email).all()
     if not users:
         abort(HTTPStatus.NOT_FOUND, 'users not found')
@@ -125,6 +128,7 @@ def get_all_users():
 @response(user_schema, 200)
 @check_access(USER_SELF.READ)
 def get_user(user_id: str):
+    """Get user info"""
     user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
@@ -137,6 +141,7 @@ def get_user(user_id: str):
 @response(new_role_schema, 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 def get_user_role(user_id: str):
+    """Get user's role info"""
     user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
@@ -160,6 +165,7 @@ def get_user_role(user_id: str):
 @response(user_role_schema, 200)
 @check_access([USER_SELF.UPDATE, USER_ALL.UPDATE])
 def set_user_role(user_id: str, role_id: str):
+    """Set new role to user"""
     user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} not found')
@@ -183,6 +189,7 @@ def set_user_role(user_id: str, role_id: str):
 @response(HistorySchema(many=True), 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
 def get_user_session_history(user_id: str):
+    """Get user's history"""
     user_history: UserHistory = UserHistory.query.filter_by(user_id=user_id).all()
     if not user_history:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')

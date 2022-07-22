@@ -1,6 +1,6 @@
 """
-The 'session_api' blueprint handles the API for managing auth.
-Specifically, this blueprint allows login, logout and refresh token operations.
+The 'auth' blueprint handles the API for managing auth.
+Specifically, this blueprint allows login, logout operations.
 """
 from flask import Blueprint
 
