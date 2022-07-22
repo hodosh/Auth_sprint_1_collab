@@ -24,7 +24,8 @@ from project.schemas import (
     update_user_schema,
     new_role_schema,
     user_role_schema,
-    HistorySchema,
+    pagination_schema,
+    paginated_history_schema,
 )
 from . import users_api_blueprint
 
@@ -186,13 +187,16 @@ def set_user_role(user_id: str, role_id: str):
 
 @users_api_blueprint.route('/<user_id>/history', methods=['GET'])
 @jwt_required()
-@response(HistorySchema(many=True), 200)
+@body(pagination_schema)
+@response(paginated_history_schema, 200)
 @check_access([USER_SELF.READ, USER_ALL.READ])
-def get_user_session_history(user_id: str):
+def get_user_session_history(kwargs, user_id: str):
     """Get user's history"""
-    user_history: UserHistory = UserHistory.query.filter_by(user_id=user_id).all()
-    if not user_history:
+    page = kwargs['page'] if kwargs else 1
+    per_page = kwargs['per_page'] if kwargs else 10
+
+    user_history: UserHistory = UserHistory.query.filter_by(user_id=user_id).paginate(page, per_page, error_out=False)
+    if not user_history.items:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} has no history yet!')
 
-    return user_history
-    # return dict(activity=user_history.activity, created=user_history.created)
+    return dict(history=user_history.items, page=page, per_page=per_page)
