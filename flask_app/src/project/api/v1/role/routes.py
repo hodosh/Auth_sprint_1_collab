@@ -19,6 +19,7 @@ from . import role_api_blueprint
 @response(role_schema, 200)
 @check_access([ROLE_SELF.CREATE, ROLE_ALL.CREATE])
 def create_role(kwargs: dict):
+    """Create new role"""
     if not kwargs:
         abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find name and permissions in data!')
     name = kwargs['name']
@@ -44,6 +45,7 @@ def create_role(kwargs: dict):
 @response(role_schema, 200)
 @check_access([ROLE_SELF.UPDATE, ROLE_ALL.UPDATE])
 def update_role(kwargs: dict, role_id: str):
+    """Update role & its permissions"""
     if not kwargs:
         abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find name and permissions in data!')
     name = kwargs['name']
@@ -67,6 +69,7 @@ def update_role(kwargs: dict, role_id: str):
 @response(ShortRoleSchema(many=True), 200)
 @check_access([ROLE_SELF.READ, ROLE_ALL.READ])
 def get_all_roles():
+    """List all roles"""
     roles = Role.query.order_by(Role.name).all()
     if not roles:
         abort(HTTPStatus.NOT_FOUND, 'roles not found')
@@ -79,6 +82,7 @@ def get_all_roles():
 @response(role_schema, 200)
 @check_access([ROLE_SELF.READ, ROLE_ALL.READ])
 def get_role(role_id: str):
+    """Get role info"""
     role = Role.query.get(role_id)
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')
@@ -93,6 +97,7 @@ def get_role(role_id: str):
 @response(role_schema, 200)
 @check_access([ROLE_SELF.DELETE, ROLE_ALL.DELETE])
 def delete_role(role_id: str):
+    """Delete role"""
     role = Role.query.get(role_id)
     if not role:
         abort(HTTPStatus.NOT_FOUND, f'role with role_id={role_id} not found')

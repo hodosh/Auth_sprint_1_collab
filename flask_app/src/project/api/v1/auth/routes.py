@@ -4,7 +4,7 @@ from apifairy import response, body
 from flask import abort
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 
-from project.core.config import ACCESS_EXPIRES
+from project.core.config import settings
 from project.extensions import jwt_redis_blocklist, log_activity
 from project.models.models import User
 from project.schemas import token_schema, message_schema, login_schema
@@ -15,6 +15,7 @@ from . import auth_api_blueprint
 @body(login_schema)
 @response(token_schema)
 def login(kwargs):
+    """Login endpoint"""
     if not kwargs:
         abort(HTTPStatus.EXPECTATION_FAILED, 'cannot find email and password in data!')
 
@@ -27,8 +28,8 @@ def login(kwargs):
 
     if not user.is_password_correct(password):
         abort(HTTPStatus.EXPECTATION_FAILED, 'password is incorrect')
-
-    access_token = create_access_token(identity=email)
+    additional_claims = {'role_id': user.role_id}
+    access_token = create_access_token(identity=email, additional_claims=additional_claims)
     log_activity(user.id, 'login')
     return dict(token=access_token)
 
@@ -37,9 +38,10 @@ def login(kwargs):
 @jwt_required()
 @response(message_schema)
 def logout():
+    """Logout endpoint"""
     jwt = get_jwt()
     jti = jwt['jti']
-    jwt_redis_blocklist.set(jti, '', ex=ACCESS_EXPIRES)
+    jwt_redis_blocklist.set(jti, '', ex=settings.ACCESS_EXPIRES)
     email = jwt['sub']
     user = User.query.filter_by(email=email).first()
 

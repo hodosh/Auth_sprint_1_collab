@@ -1,10 +1,11 @@
 from project.schemas.message import MessageSchema
+from project.schemas.pagination_schema import PaginationSchema
 from project.schemas.role import (
     RoleSchema,
     NewRoleSchema,
     PermissionSchema,
 )
-from project.schemas.session import HistorySchema, LoginSchema
+from project.schemas.session import HistorySchema, LoginSchema, PaginatedHistorySchema
 from project.schemas.token import TokenSchema
 from project.schemas.user import (
     NewUserSchema,
@@ -27,3 +28,6 @@ new_role_schema = NewRoleSchema()
 permission_schema = PermissionSchema()
 
 message_schema = MessageSchema()
+
+pagination_schema = PaginationSchema()
+paginated_history_schema = PaginatedHistorySchema()

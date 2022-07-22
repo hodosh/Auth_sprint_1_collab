@@ -11,6 +11,6 @@ flask db migrate
 echo "db upgrade"
 flask db upgrade
 echo "create roles"
-flask create roles
+flask roles create
 
 echo "stop"
