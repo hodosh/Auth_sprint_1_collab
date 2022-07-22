@@ -1,3 +1,6 @@
+"""
+The 'users' blueprint handles the API for managing users.
+"""
 from flask import Blueprint
 
 

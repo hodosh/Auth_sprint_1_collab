@@ -1,9 +1,14 @@
+from flask.cli import AppGroup
+
 from project import database
 from project.core.permissions import DEFAULT_PERMISSIONS
 from project.core.roles import DEFAULT_ROLES
 from project.models.models import Role, Permission, RolePermission
 
+roles_cli = AppGroup('roles')
 
+
+@roles_cli.command('create')
 def create_default():
     create_permissions()
     create_empty_roles()

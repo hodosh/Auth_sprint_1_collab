@@ -1,4 +1,10 @@
-from project.core.permissions import USER_SELF, USER_ALL, ROLE_SELF, ROLE_ALL, PERMISSION
+from project.core.permissions import (
+    USER_SELF,
+    USER_ALL,
+    ROLE_SELF,
+    ROLE_ALL,
+    PERMISSION,
+)
 
 SUPERUSER_ROLE = {
     USER_SELF.READ: True,
