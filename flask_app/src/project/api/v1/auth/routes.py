@@ -28,8 +28,8 @@ def login(kwargs):
 
     if not user.is_password_correct(password):
         abort(HTTPStatus.EXPECTATION_FAILED, 'password is incorrect')
-
-    access_token = create_access_token(identity=email)
+    additional_claims = {'role_id': user.role_id}
+    access_token = create_access_token(identity=email, additional_claims=additional_claims)
     log_activity(user.id, 'login')
     return dict(token=access_token)
 

@@ -5,7 +5,7 @@ from apifairy import (
     response,
 )
 from flask import abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 
 from project import database
 from project.core.permissions import USER_SELF, USER_ALL
@@ -140,14 +140,16 @@ def get_user(user_id: str):
 @users_api_blueprint.route('/<user_id>/role', methods=['GET'])
 @jwt_required()
 @response(new_role_schema, 200)
-@check_access([USER_SELF.READ, USER_ALL.READ])
+@check_access([USER_SELF.READ])
 def get_user_role(user_id: str):
     """Get user's role info"""
     user = User.query.get(user_id)
     if not user:
         abort(HTTPStatus.NOT_FOUND, f'user with user_id={user_id} not found')
 
-    role_id = user.role_id
+    jwt = get_jwt()
+
+    role_id = jwt['role_id']
     if not role_id:
         abort(HTTPStatus.NOT_FOUND, f'user with id={user_id} has no any role')
 
